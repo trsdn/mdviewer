@@ -3,7 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<style>
+<meta http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'nonce-{{CSP_NONCE}}'; style-src 'nonce-{{CSP_NONCE}}'; img-src mdviewer-resource:; media-src 'none'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
+<style nonce="{{CSP_NONCE}}">
 :root {
     --color-bg: #ffffff;
     --color-fg: #24292f;
@@ -28,9 +30,7 @@
     }
 }
 
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
@@ -48,6 +48,7 @@ h1, h2, h3, h4, h5, h6 {
     margin-bottom: 16px;
     font-weight: 600;
     line-height: 1.25;
+    scroll-margin-top: 16px;
 }
 
 h1 { font-size: 2em; padding-bottom: 0.3em; border-bottom: 1px solid var(--color-border); }
@@ -56,7 +57,6 @@ h3 { font-size: 1.25em; }
 h4 { font-size: 1em; }
 
 p { margin-top: 0; margin-bottom: 16px; }
-
 a { color: var(--color-link); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
@@ -76,11 +76,7 @@ pre {
     line-height: 1.45;
 }
 
-pre code {
-    background: none;
-    padding: 0;
-    font-size: 85%;
-}
+pre code { background: none; padding: 0; font-size: 85%; }
 
 blockquote {
     margin: 0 0 16px 0;
@@ -98,12 +94,7 @@ hr {
     border-radius: 2px;
 }
 
-ul, ol {
-    margin-top: 0;
-    margin-bottom: 16px;
-    padding-left: 2em;
-}
-
+ul, ol { margin-top: 0; margin-bottom: 16px; padding-left: 2em; }
 li + li { margin-top: 0.25em; }
 
 table {
@@ -114,28 +105,135 @@ table {
     overflow: auto;
 }
 
-th, td {
-    padding: 6px 13px;
-    border: 1px solid var(--color-border);
-}
-
+th, td { padding: 6px 13px; border: 1px solid var(--color-border); }
 th { font-weight: 600; }
-
 tr:nth-child(2n) { background-color: var(--color-code-bg); }
-
 img { max-width: 100%; height: auto; }
-
 input[type="checkbox"] { margin-right: 0.5em; }
+
+@media (max-width: 600px) {
+    body { padding: 24px; }
+}
 </style>
 </head>
 <body>
-<div id="content"></div>
-<script>{{MARKED_JS}}</script>
-<script>
-    // Content is from local user files rendered in a sandboxed WKWebView
-    const md = `{{MARKDOWN_CONTENT}}`;
-    const rendered = marked.parse(md);
-    document.getElementById('content').innerHTML = rendered;
+<main id="content"></main>
+<script nonce="{{CSP_NONCE}}">{{MARKED_JS}}</script>
+<script nonce="{{CSP_NONCE}}">{{DOMPURIFY_JS}}</script>
+<script nonce="{{CSP_NONCE}}">
+    const allowedTags = [
+        'a', 'abbr', 'b', 'blockquote', 'br', 'code', 'dd', 'del', 'details',
+        'div', 'dl', 'dt', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr',
+        'i', 'img', 'input', 'kbd', 'li', 'mark', 'ol', 'p', 'pre', 'q',
+        's', 'samp', 'small', 'span', 'strong', 'sub', 'summary', 'sup',
+        'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'time', 'tr', 'ul',
+        'var'
+    ];
+    const allowedAttributes = [
+        'alt', 'checked', 'colspan', 'datetime', 'disabled', 'href', 'open',
+        'reversed', 'rowspan', 'src', 'start', 'title', 'type'
+    ];
+    const schemePattern = /^[a-z][a-z0-9+.-]*:/i;
+
+    function isRelativeImage(value) {
+        const trimmed = value.trim();
+        if (trimmed.length === 0
+            || trimmed.startsWith('/')
+            || trimmed.startsWith('//')
+            || trimmed.startsWith('#')
+            || trimmed.includes('?')
+            || trimmed.includes('#')
+            || trimmed.includes('\\')
+            || schemePattern.test(trimmed)) {
+            return false;
+        }
+
+        try {
+            const decoded = decodeURIComponent(trimmed);
+            return !decoded.split('/').includes('..')
+                && !decoded.includes('\0')
+                && /\.(png|jpe?g|gif|webp)$/i.test(decoded);
+        } catch {
+            return false;
+        }
+    }
+
+    function isSafeLink(value) {
+        const trimmed = value.trim();
+        return /^#[^\s]*$/.test(trimmed)
+            || /^(https?:|mailto:)/i.test(trimmed);
+    }
+
+    DOMPurify.addHook('uponSanitizeAttribute', (node, data) => {
+        const tagName = node.nodeName.toLowerCase();
+        const attributeName = data.attrName.toLowerCase();
+
+        if (tagName === 'a' && attributeName === 'href') {
+            data.keepAttr = isSafeLink(data.attrValue);
+        } else if (tagName === 'img' && attributeName === 'src') {
+            data.keepAttr = isRelativeImage(data.attrValue);
+        }
+    });
+
+    function normalizeTaskCheckboxes(fragment) {
+        for (const input of fragment.querySelectorAll('input')) {
+            if ((input.getAttribute('type') || '').toLowerCase() !== 'checkbox') {
+                input.remove();
+                continue;
+            }
+
+            const checked = input.hasAttribute('checked');
+            for (const attribute of Array.from(input.attributes)) {
+                input.removeAttribute(attribute.name);
+            }
+            input.setAttribute('type', 'checkbox');
+            input.setAttribute('disabled', '');
+            if (checked) input.setAttribute('checked', '');
+        }
+    }
+
+    function assignHeadingIDs(fragment) {
+        const used = new Set();
+        for (const heading of fragment.querySelectorAll('h1, h2, h3, h4, h5, h6')) {
+            const base = heading.textContent
+                .toLowerCase()
+                .trim()
+                .replace(/[^\p{L}\p{N}\s_-]/gu, '')
+                .replace(/\s+/g, '-') || 'section';
+            let id = base;
+            let suffix = 1;
+            while (used.has(id)) {
+                id = `${base}-${suffix++}`;
+            }
+            used.add(id);
+            heading.id = id;
+        }
+    }
+
+    window.__mdviewerRenderCount = 0;
+    window.renderMarkdown = function(markdown) {
+        const rawHTML = marked.parse(markdown, { gfm: true });
+        const fragment = DOMPurify.sanitize(rawHTML, {
+            ALLOWED_TAGS: allowedTags,
+            ALLOWED_ATTR: allowedAttributes,
+            ALLOW_ARIA_ATTR: false,
+            ALLOW_DATA_ATTR: false,
+            RETURN_DOM_FRAGMENT: true
+        });
+
+        normalizeTaskCheckboxes(fragment);
+        assignHeadingIDs(fragment);
+
+        const content = document.getElementById('content');
+        content.replaceChildren(fragment);
+        window.__mdviewerRenderCount += 1;
+
+        return {
+            images: Array.from(content.querySelectorAll('img[src]'))
+                .map((image) => image.getAttribute('src')),
+            renderCount: window.__mdviewerRenderCount
+        };
+    };
 </script>
 </body>
 </html>

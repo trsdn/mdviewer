@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MDViewer — Minimal macOS Markdown Viewer</title>
-<meta name="description" content="A macOS Markdown viewer under 500 KB. GitHub-style rendering, automatic Dark Mode, sub-50ms cold start. No Electron, no bloat.">
+<meta name="description" content="A 1.1 MB macOS Markdown viewer with secure GitHub-style rendering, automatic Dark Mode, and no external runtime.">
 <meta name="keywords" content="markdown viewer, macOS, markdown reader, dark mode, lightweight, SwiftUI, markdown app">
 <meta name="author" content="Torsten Mahr">
 <meta name="theme-color" content="#0a0a0b">
@@ -16,13 +16,13 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://trsdn.github.io/mdviewer/">
 <meta property="og:title" content="MDViewer — Minimal macOS Markdown Viewer">
-<meta property="og:description" content="A macOS Markdown viewer under 500 KB. GitHub-style rendering, automatic Dark Mode, sub-50ms cold start. No Electron, no bloat.">
+<meta property="og:description" content="A 1.1 MB macOS Markdown viewer with secure GitHub-style rendering, automatic Dark Mode, and no external runtime.">
 <meta property="og:site_name" content="MDViewer">
 <meta property="og:locale" content="en_US">
 
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="MDViewer — Sub-500KB Markdown Viewer for macOS">
-<meta name="twitter:description" content="GitHub-style rendering, Dark Mode, sub-50ms cold start, under 100 MB RAM. No Electron, no dependencies.">
+<meta name="twitter:title" content="MDViewer — Minimal Markdown Viewer for macOS">
+<meta name="twitter:description" content="Secure GitHub-style rendering, Dark Mode, sub-50ms cold start, and no external runtime.">
 
 <script type="application/ld+json">
 {
@@ -32,8 +32,8 @@
   "operatingSystem": "macOS 13.0+",
   "applicationCategory": "DeveloperApplication",
   "description": "A minimal macOS Markdown viewer with GitHub-style rendering and Dark Mode support.",
-  "fileSize": "<500KB",
-  "softwareVersion": "1.0.0",
+  "fileSize": "1.1MB",
+  "softwareVersion": "1.1.0",
   "license": "https://opensource.org/licenses/MIT",
   "url": "https://trsdn.github.io/mdviewer/",
   "downloadUrl": "https://github.com/trsdn/mdviewer/releases/latest",
@@ -547,7 +547,7 @@ footer a:hover { color: var(--fg); }
     <section class="hero" id="hero">
         <div class="hero-icon" role="img" aria-label="MDViewer app icon">md</div>
         <h1>Read markdown,<br><em>nothing else.</em></h1>
-        <p class="hero-sub">A macOS Markdown viewer under 500 KB. GitHub-style rendering, automatic Dark Mode, zero dependencies. Less than 100 MB RAM.</p>
+        <p class="hero-sub">A 1.1 MB macOS Markdown viewer. Secure GitHub-style rendering, automatic Dark Mode, and no external runtime. Less than 100 MB RAM.</p>
         <div class="hero-cta">
             <a href="https://github.com/trsdn/mdviewer/releases/latest" class="btn-primary">Download for macOS</a>
             <a href="https://github.com/trsdn/mdviewer" class="btn-ghost" target="_blank" rel="noopener">View source &rarr;</a>
@@ -560,7 +560,7 @@ footer a:hover { color: var(--fg); }
     <section class="stats reveal" aria-label="Performance metrics">
         <div class="stats-inner">
             <div class="stat">
-                <div class="stat-value">&lt;500<span class="unit"> KB</span></div>
+                <div class="stat-value">~1.1<span class="unit"> MB</span></div>
                 <div class="stat-label">App size</div>
             </div>
             <div class="stat">
@@ -572,7 +572,7 @@ footer a:hover { color: var(--fg); }
                 <div class="stat-label">Cold start</div>
             </div>
             <div class="stat">
-                <div class="stat-value">&lt;150<span class="unit"> KB</span></div>
+                <div class="stat-value">~330<span class="unit"> KB</span></div>
                 <div class="stat-label">Download</div>
             </div>
         </div>
@@ -587,7 +587,7 @@ footer a:hover { color: var(--fg); }
             <article class="feature">
                 <p class="feature-num">01</p>
                 <h3>GitHub-style rendering</h3>
-                <p>Markdown parsed with marked.js. Tables, fenced code blocks, task lists, blockquotes &mdash; rendered cleanly without a browser.</p>
+                <p>Markdown parsed with marked.js and sanitized with DOMPurify. Tables, task lists, and code render in a locked-down native WebKit preview.</p>
             </article>
             <article class="feature">
                 <p class="feature-num">02</p>
@@ -602,7 +602,7 @@ footer a:hover { color: var(--fg); }
             <article class="feature">
                 <p class="feature-num">04</p>
                 <h3>No Electron. No runtime.</h3>
-                <p>Under 500 KB total. No bundled browser, no Node.js, no frameworks. Just a native binary that launches in under 50 ms.</p>
+                <p>About 1.1 MB total. No bundled browser, Node.js, package manager, or third-party native framework.</p>
             </article>
         </div>
     </section>

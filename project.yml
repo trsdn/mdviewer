@@ -6,6 +6,33 @@ options:
   xcodeVersion: "16.0"
   minimumXcodeGenVersion: "2.38"
 
+schemes:
+  MDViewer:
+    build:
+      targets:
+        MDViewer: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - MDViewerTests
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
+
+  MDViewerUITests:
+    build:
+      targets:
+        MDViewer: all
+    test:
+      config: Debug
+      targets:
+        - MDViewerUITests
+
 targets:
   MDViewer:
     type: application
@@ -16,10 +43,50 @@ targets:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.torstenmahr.MDViewer
         PRODUCT_NAME: MDViewer
-        MARKETING_VERSION: "1.0.0"
-        CURRENT_PROJECT_VERSION: "1"
+        MARKETING_VERSION: "1.1.0"
+        CURRENT_PROJECT_VERSION: "2"
         INFOPLIST_FILE: MDViewer/Info.plist
         GENERATE_INFOPLIST_FILE: false
         SWIFT_VERSION: "5.9"
         MACOSX_DEPLOYMENT_TARGET: "13.0"
         CODE_SIGN_STYLE: Automatic
+        CODE_SIGN_ENTITLEMENTS: MDViewer/MDViewer.entitlements
+        ENABLE_APP_SANDBOX: true
+      configs:
+        Release:
+          CODE_SIGN_INJECT_BASE_ENTITLEMENTS: false
+          ENABLE_HARDENED_RUNTIME: true
+          SWIFT_OPTIMIZATION_LEVEL: "-Osize"
+          DEAD_CODE_STRIPPING: true
+          STRIP_INSTALLED_PRODUCT: true
+          STRIP_SWIFT_SYMBOLS: true
+          STRIP_STYLE: "non-global"
+
+  MDViewerTests:
+    type: bundle.unit-test
+    platform: macOS
+    sources:
+      - MDViewerTests
+    dependencies:
+      - target: MDViewer
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.torstenmahr.MDViewerTests
+        GENERATE_INFOPLIST_FILE: true
+        SWIFT_VERSION: "5.9"
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/MDViewer.app/Contents/MacOS/MDViewer"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+
+  MDViewerUITests:
+    type: bundle.ui-testing
+    platform: macOS
+    sources:
+      - MDViewerUITests
+    dependencies:
+      - target: MDViewer
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.torstenmahr.MDViewerUITests
+        GENERATE_INFOPLIST_FILE: true
+        SWIFT_VERSION: "5.9"
+        TEST_TARGET_NAME: MDViewer

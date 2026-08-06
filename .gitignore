@@ -4,6 +4,9 @@ xcuserdata/
 DerivedData/
 *.xcworkspace/
 build/
+release-build/
+dist/
+.release.env
 
 # macOS
 .DS_Store
