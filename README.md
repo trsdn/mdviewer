@@ -68,8 +68,6 @@ Choose preferred palettes in **MDViewer > Settings**. System mode follows the cu
 
 Themes use built-in trusted palettes and apply without reloading the document or changing its scroll position or zoom.
 
-Special thanks to [@asherweintraub](https://github.com/asherweintraub) for the theme and Settings inspiration in the [asherweintraub/mdviewer fork](https://github.com/asherweintraub/mdviewer), and to [@ulfendk](https://github.com/ulfendk) for the Sepia inspiration in the [ulfendk/mdviewer fork](https://github.com/ulfendk/mdviewer).
-
 ## Dependencies
 
 | Library | Version | License | Purpose |
