@@ -37,6 +37,10 @@ xcodegen generate
 xcodebuild -scheme MDViewer -configuration Release build
 ```
 
+## Need editing too?
+
+[MDViewer+](https://github.com/trsdn/mdviewerplus) adds a native Markdown editor, live split preview, scroll sync, syntax highlighting, formatting shortcuts, and printing while keeping the same lightweight macOS approach. See the [MDViewer+ website](https://trsdn.github.io/mdviewerplus/).
+
 ## Keyboard Shortcuts
 
 | Action | Shortcut |
