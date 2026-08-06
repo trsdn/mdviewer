@@ -23,13 +23,13 @@ A minimal macOS Markdown viewer. No editor, no bloat — just clean rendering wi
 | Metric | Value |
 |--------|-------|
 | App size | ~1.1 MB |
-| Download (zip) | ~330 KB |
+| Download (DMG) | ~610 KB |
 | Cold start | < 50 ms |
 | Memory | < 100 MB |
 
 ## Install
 
-Download the latest `.app` from [Releases](https://github.com/trsdn/mdviewer/releases) or build from source:
+Download the latest signed and notarized `.dmg` from [Releases](https://github.com/trsdn/mdviewer/releases) or build from source:
 
 ```bash
 brew install xcodegen
