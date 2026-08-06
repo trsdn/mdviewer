@@ -1,6 +1,6 @@
 # MDViewer
 
-A minimal macOS Markdown viewer. No editor, no bloat — just clean rendering with automatic Dark Mode support.
+A minimal macOS Markdown viewer. No editor, no bloat — just clean rendering with curated reading themes.
 
 ![macOS](https://img.shields.io/badge/macOS-13.0+-black?logo=apple)
 ![Swift](https://img.shields.io/badge/Swift-5.9-F05138?logo=swift&logoColor=white)
@@ -12,7 +12,8 @@ A minimal macOS Markdown viewer. No editor, no bloat — just clean rendering wi
 
 - **Secure GitHub-flavored rendering** via [marked.js](https://marked.js.org) and [DOMPurify](https://github.com/cure53/DOMPurify)
 - **Private local images** — optional read-only folder access for relative PNG, JPEG, GIF, and WebP images
-- **Dark Mode** — automatic (system), light, or dark via View > Appearance
+- **Curated themes** — GitHub, Solarized, Sepia, Dracula, Monokai, and Nord palettes
+- **Automatic appearance** — System, Light, or Dark mode with separate preferred light and dark themes
 - **Window-scoped zoom** — Cmd+/Cmd- affects only the active window and becomes the default for new windows
 - **Reload** — Cmd+R to refresh after external edits
 - **Native file handling** — Open, Recent Files, drag & drop
@@ -43,6 +44,8 @@ xcodebuild -scheme MDViewer -configuration Release build
 
 ## Keyboard Shortcuts
 
+Choose preferred palettes in **MDViewer > Settings**. System mode follows the current macOS appearance and switches between those preferences. Sepia is a light palette selected in Settings; the existing mode shortcuts remain unchanged.
+
 | Action | Shortcut |
 |--------|----------|
 | Reload | `Cmd R` |
@@ -52,6 +55,20 @@ xcodebuild -scheme MDViewer -configuration Release build
 | System Appearance | `Cmd Shift 0` |
 | Light Mode | `Cmd Shift 1` |
 | Dark Mode | `Cmd Shift 2` |
+
+## Reading Themes
+
+| Light themes | Dark themes |
+|--------------|-------------|
+| GitHub Light | GitHub Dark |
+| Solarized Light | Solarized Dark |
+| Sepia | Dracula |
+|  | Monokai |
+|  | Nord |
+
+Themes use built-in trusted palettes and apply without reloading the document or changing its scroll position or zoom.
+
+Special thanks to [@asherweintraub](https://github.com/asherweintraub) for the theme and Settings inspiration in the [asherweintraub/mdviewer fork](https://github.com/asherweintraub/mdviewer), and to [@ulfendk](https://github.com/ulfendk) for the Sepia inspiration in the [ulfendk/mdviewer fork](https://github.com/ulfendk/mdviewer).
 
 ## Dependencies
 

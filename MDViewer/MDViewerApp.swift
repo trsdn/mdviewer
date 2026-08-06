@@ -1,29 +1,19 @@
 import SwiftUI
 
-enum AppearanceMode: String, CaseIterable {
-    case system = "system"
-    case light = "light"
-    case dark = "dark"
-
-    var label: String {
-        switch self {
-        case .system: return "System"
-        case .light: return "Light"
-        case .dark: return "Dark"
-        }
-    }
-}
-
 @main
 struct MDViewerApp: App {
     @AppStorage("appearanceMode") private var appearanceMode: String = AppearanceMode.system.rawValue
+    @AppStorage("lightThemeID") private var lightThemeID: String = ThemeRegistry.defaultLightThemeID
+    @AppStorage("darkThemeID") private var darkThemeID: String = ThemeRegistry.defaultDarkThemeID
 
     var body: some Scene {
         DocumentGroup(viewing: MarkdownDocument.self) { file in
-            ContentView(
+            ResolvedThemeDocumentView(
                 document: file.document,
                 fileURL: file.fileURL,
-                appearanceMode: AppearanceMode(rawValue: appearanceMode) ?? .system
+                appearanceMode: AppearanceMode(rawValue: appearanceMode) ?? .system,
+                lightThemeID: lightThemeID,
+                darkThemeID: darkThemeID
             )
         }
         .commands {
@@ -46,6 +36,37 @@ struct MDViewerApp: App {
                     }
                 }
             }
+        }
+
+        Settings {
+            ThemeSettingsView(
+                appearanceMode: $appearanceMode,
+                lightThemeID: $lightThemeID,
+                darkThemeID: $darkThemeID
+            )
+        }
+    }
+
+    private struct ResolvedThemeDocumentView: View {
+        @Environment(\.colorScheme) private var colorScheme
+
+        let document: MarkdownDocument
+        let fileURL: URL?
+        let appearanceMode: AppearanceMode
+        let lightThemeID: String
+        let darkThemeID: String
+
+        var body: some View {
+            ContentView(
+                document: document,
+                fileURL: fileURL,
+                palette: ThemeRegistry.resolve(
+                    mode: appearanceMode,
+                    systemColorScheme: colorScheme,
+                    lightThemeID: lightThemeID,
+                    darkThemeID: darkThemeID
+                )
+            )
         }
     }
 

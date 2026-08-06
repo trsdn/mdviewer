@@ -25,9 +25,56 @@ struct MarkdownNavigationPolicy {
     }
 }
 
+struct ThemeApplicationRequest: Equatable {
+    let id: Int
+    let palette: ThemePalette
+}
+
+struct ThemeApplicationState {
+    private(set) var desiredPalette: ThemePalette
+    private(set) var inFlightRequest: ThemeApplicationRequest?
+    private(set) var appliedPalette: ThemePalette?
+    private var nextRequestID = 0
+
+    init(desiredPalette: ThemePalette) {
+        self.desiredPalette = desiredPalette
+    }
+
+    mutating func setDesiredPalette(_ palette: ThemePalette) {
+        desiredPalette = palette
+    }
+
+    mutating func beginNextApplication() -> ThemeApplicationRequest? {
+        guard inFlightRequest == nil, appliedPalette != desiredPalette else {
+            return nil
+        }
+        nextRequestID += 1
+        let request = ThemeApplicationRequest(id: nextRequestID, palette: desiredPalette)
+        inFlightRequest = request
+        return request
+    }
+
+    @discardableResult
+    mutating func complete(requestID: Int, succeeded: Bool) -> Bool {
+        guard let request = inFlightRequest, request.id == requestID else {
+            return false
+        }
+        inFlightRequest = nil
+        if succeeded {
+            appliedPalette = request.palette
+        }
+        return true
+    }
+
+    mutating func resetForPageLoad() {
+        inFlightRequest = nil
+        appliedPalette = nil
+    }
+}
+
 struct MarkdownWebView: NSViewRepresentable {
     let text: String
-    let appearanceMode: AppearanceMode
+    let palette: ThemePalette
     let zoomLevel: Double
     let resourceRoot: URL?
     var onError: ((String) -> Void)?
@@ -57,11 +104,11 @@ struct MarkdownWebView: NSViewRepresentable {
         coordinator.webView = webView
         coordinator.resourceHandler = resourceHandler
         coordinator.pendingText = text
-        coordinator.lastAppearance = appearanceMode
+        coordinator.setDesiredPalette(palette)
         coordinator.lastZoom = zoomLevel
         coordinator.lastResourceRoot = resourceRoot
 
-        applyAppearance(to: webView)
+        applyNativeAppearance(to: webView)
         applyZoom(to: webView)
         coordinator.loadRenderPage()
         return webView
@@ -70,6 +117,7 @@ struct MarkdownWebView: NSViewRepresentable {
     static func dismantleNSView(_ webView: WKWebView, coordinator: Coordinator) {
         webView.navigationDelegate = nil
         webView.uiDelegate = nil
+        coordinator.stopThemeApplication()
         coordinator.webView = nil
         coordinator.resourceHandler = nil
     }
@@ -84,9 +132,9 @@ struct MarkdownWebView: NSViewRepresentable {
             coordinator.invalidateRender()
         }
 
-        if coordinator.lastAppearance != appearanceMode {
-            coordinator.lastAppearance = appearanceMode
-            applyAppearance(to: webView)
+        if coordinator.desiredPalette != palette {
+            coordinator.setDesiredPalette(palette)
+            applyNativeAppearance(to: webView)
         }
 
         if coordinator.lastZoom != zoomLevel {
@@ -94,6 +142,7 @@ struct MarkdownWebView: NSViewRepresentable {
             applyZoom(to: webView)
         }
 
+        coordinator.requestThemeApplication()
         coordinator.requestRender(text)
     }
 
@@ -101,7 +150,6 @@ struct MarkdownWebView: NSViewRepresentable {
     final class Coordinator: NSObject, WKNavigationDelegate, WKUIDelegate {
         var parent: MarkdownWebView
         var pendingText = ""
-        var lastAppearance: AppearanceMode = .system
         var lastZoom: Double = 1.0
         var lastResourceRoot: URL?
         weak var webView: WKWebView?
@@ -110,10 +158,32 @@ struct MarkdownWebView: NSViewRepresentable {
         private var isPageReady = false
         private var lastRenderedText: String?
         private var renderGeneration = 0
+        private var themeState: ThemeApplicationState
+        private var themeRetryTask: Task<Void, Never>?
+        private var themeRetryCount = 0
+        private let maximumAutomaticThemeRetries = 2
+
+        var desiredPalette: ThemePalette {
+            themeState.desiredPalette
+        }
 
         init(_ parent: MarkdownWebView) {
             self.parent = parent
+            self.themeState = ThemeApplicationState(desiredPalette: parent.palette)
             super.init()
+        }
+
+        func setDesiredPalette(_ palette: ThemePalette) {
+            guard themeState.desiredPalette != palette else { return }
+            themeState.setDesiredPalette(palette)
+            themeRetryTask?.cancel()
+            themeRetryTask = nil
+            themeRetryCount = 0
+        }
+
+        func stopThemeApplication() {
+            themeRetryTask?.cancel()
+            themeRetryTask = nil
         }
 
         func loadRenderPage() {
@@ -122,6 +192,10 @@ struct MarkdownWebView: NSViewRepresentable {
             do {
                 isPageReady = false
                 lastRenderedText = nil
+                themeState.resetForPageLoad()
+                themeRetryTask?.cancel()
+                themeRetryTask = nil
+                themeRetryCount = 0
                 webView.loadHTMLString(
                     try MarkdownRenderPage.makeHTML(),
                     baseURL: MarkdownResourceResolver.baseURL
@@ -165,10 +239,67 @@ struct MarkdownWebView: NSViewRepresentable {
             }
         }
 
+        func requestThemeApplication() {
+            guard isPageReady,
+                  let webView,
+                  let request = themeState.beginNextApplication() else { return }
+
+            webView.callAsyncJavaScript(
+                "return window.applyTheme(theme);",
+                arguments: ["theme": request.palette.colors.webArguments],
+                in: nil,
+                in: .page
+            ) { [weak self] result in
+                guard let self else { return }
+
+                switch result {
+                case .success:
+                    guard self.themeState.complete(
+                        requestID: request.id,
+                        succeeded: true
+                    ) else { return }
+                    self.themeRetryTask?.cancel()
+                    self.themeRetryTask = nil
+                    self.themeRetryCount = 0
+                    self.requestThemeApplication()
+                case .failure(let error):
+                    guard self.themeState.complete(
+                        requestID: request.id,
+                        succeeded: false
+                    ) else { return }
+                    self.report(error)
+                    if self.themeState.desiredPalette == request.palette {
+                        self.scheduleThemeRetry()
+                    } else {
+                        self.requestThemeApplication()
+                    }
+                }
+            }
+        }
+
+        private func scheduleThemeRetry() {
+            guard themeState.appliedPalette != themeState.desiredPalette,
+                  themeRetryCount < maximumAutomaticThemeRetries else { return }
+
+            themeRetryCount += 1
+            themeRetryTask?.cancel()
+            themeRetryTask = Task { @MainActor [weak self] in
+                try? await Task.sleep(nanoseconds: 100_000_000)
+                guard !Task.isCancelled else { return }
+                self?.themeRetryTask = nil
+                self?.requestThemeApplication()
+            }
+        }
+
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
             guard webView === self.webView else { return }
             isPageReady = true
             lastRenderedText = nil
+            themeState.resetForPageLoad()
+            themeRetryTask?.cancel()
+            themeRetryTask = nil
+            themeRetryCount = 0
+            requestThemeApplication()
             requestRender(pendingText)
         }
 
@@ -257,10 +388,8 @@ struct MarkdownWebView: NSViewRepresentable {
         }
     }
 
-    private func applyAppearance(to webView: WKWebView) {
-        switch appearanceMode {
-        case .system:
-            webView.appearance = nil
+    private func applyNativeAppearance(to webView: WKWebView) {
+        switch palette.category {
         case .light:
             webView.appearance = NSAppearance(named: .aqua)
         case .dark:

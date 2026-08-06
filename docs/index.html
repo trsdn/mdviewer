@@ -4,8 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>MDViewer — Minimal macOS Markdown Viewer</title>
-<meta name="description" content="A 1.1 MB macOS Markdown viewer with secure GitHub-style rendering, automatic Dark Mode, and no external runtime.">
-<meta name="keywords" content="markdown viewer, macOS, markdown reader, dark mode, lightweight, SwiftUI, markdown app">
+<meta name="description" content="A lightweight macOS Markdown viewer with secure GitHub-style rendering, curated reading themes, and no external runtime.">
+<meta name="keywords" content="markdown viewer, macOS, markdown reader, sepia, themes, dark mode, lightweight, SwiftUI, markdown app">
 <meta name="author" content="Torsten Mahr">
 <meta name="theme-color" content="#0a0a0b">
 <link rel="icon" href="favicon.ico" sizes="any">
@@ -16,13 +16,13 @@
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://trsdn.github.io/mdviewer/">
 <meta property="og:title" content="MDViewer — Minimal macOS Markdown Viewer">
-<meta property="og:description" content="A 1.1 MB macOS Markdown viewer with secure GitHub-style rendering, automatic Dark Mode, and no external runtime.">
+<meta property="og:description" content="A lightweight macOS Markdown viewer with secure GitHub-style rendering, curated reading themes, and no external runtime.">
 <meta property="og:site_name" content="MDViewer">
 <meta property="og:locale" content="en_US">
 
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="MDViewer — Minimal Markdown Viewer for macOS">
-<meta name="twitter:description" content="Secure GitHub-style rendering, Dark Mode, sub-50ms cold start, and no external runtime.">
+<meta name="twitter:description" content="Secure GitHub-style rendering, curated reading themes, sub-50ms cold start, and no external runtime.">
 
 <script type="application/ld+json">
 {
@@ -31,9 +31,9 @@
   "name": "MDViewer",
   "operatingSystem": "macOS 13.0+",
   "applicationCategory": "DeveloperApplication",
-  "description": "A minimal macOS Markdown viewer with GitHub-style rendering and Dark Mode support.",
+  "description": "A minimal macOS Markdown viewer with secure rendering and curated reading themes.",
   "fileSize": "1.1MB",
-  "softwareVersion": "1.1.0",
+  "softwareVersion": "1.2.0",
   "license": "https://opensource.org/licenses/MIT",
   "url": "https://trsdn.github.io/mdviewer/",
   "downloadUrl": "https://github.com/trsdn/mdviewer/releases/latest",
@@ -379,6 +379,82 @@ nav {
     font-weight: 300;
 }
 
+/* ---- THEMES ---- */
+.themes {
+    padding: 0 24px 120px;
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+.themes .label {
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+.themes h2 {
+    font-family: var(--serif);
+    font-size: clamp(36px, 5vw, 56px);
+    font-weight: 400;
+    margin-bottom: 16px;
+}
+
+.themes-intro, .theme-thanks {
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 300;
+    max-width: 760px;
+}
+
+.theme-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin: 40px 0;
+}
+
+.theme-card {
+    --theme-bg: #fff;
+    --theme-fg: #24292f;
+    --theme-accent: #0969da;
+    min-height: 120px;
+    padding: 20px;
+    border: 1px solid color-mix(in srgb, var(--theme-fg) 24%, var(--theme-bg));
+    border-radius: 8px;
+    background: var(--theme-bg);
+    color: var(--theme-fg);
+}
+
+.theme-card strong {
+    display: block;
+    font-family: var(--serif);
+    font-size: 20px;
+    font-weight: 400;
+    margin-bottom: 28px;
+}
+
+.theme-swatch {
+    display: flex;
+    gap: 6px;
+}
+
+.theme-swatch i {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--theme-accent);
+    border: 1px solid color-mix(in srgb, var(--theme-fg) 20%, transparent);
+}
+
+.theme-swatch i:nth-child(2) { background: var(--theme-fg); }
+.theme-swatch i:nth-child(3) {
+    background: color-mix(in srgb, var(--theme-bg) 80%, var(--theme-fg));
+}
+
+.theme-thanks a { color: var(--fg); }
+
 /* ---- INSTALL ---- */
 .install {
     padding: 120px 24px;
@@ -518,6 +594,7 @@ footer a:hover { color: var(--fg); }
     .nav-links { gap: 16px; }
     .stats-inner { grid-template-columns: repeat(2, 1fr); }
     .feature-grid { grid-template-columns: 1fr; }
+    .theme-grid { grid-template-columns: repeat(2, 1fr); }
     .hero-cta { flex-direction: column; }
     footer { flex-direction: column; gap: 16px; text-align: center; }
     .feature { padding: 36px 28px; }
@@ -528,6 +605,7 @@ footer a:hover { color: var(--fg); }
     .stat-value { font-size: 36px; }
     nav { padding: 14px 16px; }
     .nav-links a:not(.nav-download) { display: none; }
+    .theme-grid { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -537,6 +615,7 @@ footer a:hover { color: var(--fg); }
     <a href="#" class="nav-logo">mdviewer</a>
     <div class="nav-links">
         <a href="#features">Features</a>
+        <a href="#themes">Themes</a>
         <a href="#install">Install</a>
         <a href="https://github.com/trsdn/mdviewer" target="_blank" rel="noopener">GitHub</a>
         <a href="https://github.com/trsdn/mdviewer/releases/latest" class="nav-download" target="_blank" rel="noopener">Download</a>
@@ -547,7 +626,7 @@ footer a:hover { color: var(--fg); }
     <section class="hero" id="hero">
         <div class="hero-icon" role="img" aria-label="MDViewer app icon">md</div>
         <h1>Read markdown,<br><em>nothing else.</em></h1>
-        <p class="hero-sub">A 1.1 MB macOS Markdown viewer. Secure GitHub-style rendering, automatic Dark Mode, and no external runtime. Less than 100 MB RAM.</p>
+        <p class="hero-sub">A lightweight macOS Markdown viewer. Secure GitHub-style rendering, curated reading themes, and no external runtime. Less than 100 MB RAM.</p>
         <div class="hero-cta">
             <a href="https://github.com/trsdn/mdviewer/releases/latest" class="btn-primary">Download for macOS</a>
             <a href="https://github.com/trsdn/mdviewer" class="btn-ghost" target="_blank" rel="noopener">View source &rarr;</a>
@@ -591,8 +670,8 @@ footer a:hover { color: var(--fg); }
             </article>
             <article class="feature">
                 <p class="feature-num">02</p>
-                <h3>Automatic Dark Mode</h3>
-                <p>Follows your system appearance. Or override it manually &mdash; Light, Dark, or System &mdash; persistent across sessions.</p>
+                <h3>Curated reading themes</h3>
+                <p>Choose separate light and dark palettes. System mode follows macOS automatically, while Light and Dark stay one shortcut away.</p>
             </article>
             <article class="feature">
                 <p class="feature-num">03</p>
@@ -605,6 +684,23 @@ footer a:hover { color: var(--fg); }
                 <p>About 1.1 MB total. No bundled browser, Node.js, package manager, or third-party native framework.</p>
             </article>
         </div>
+    </section>
+
+    <section class="themes reveal" id="themes">
+        <p class="label">Reading themes</p>
+        <h2>Eight trusted palettes.</h2>
+        <p class="themes-intro">Choose a preferred light and dark palette in Settings. Theme changes preserve the document, scroll position, and zoom. Sepia is a light palette; the System, Light, and Dark shortcuts remain unchanged.</p>
+        <div class="theme-grid">
+            <article class="theme-card" style="--theme-bg:#ffffff;--theme-fg:#24292f;--theme-accent:#0969da"><strong>GitHub Light</strong><span class="theme-swatch"><i></i><i></i><i></i></span></article>
+            <article class="theme-card" style="--theme-bg:#fdf6e3;--theme-fg:#586e75;--theme-accent:#006da8"><strong>Solarized Light</strong><span class="theme-swatch"><i></i><i></i><i></i></span></article>
+            <article class="theme-card" style="--theme-bg:#f4ecd8;--theme-fg:#3e3629;--theme-accent:#765200"><strong>Sepia</strong><span class="theme-swatch"><i></i><i></i><i></i></span></article>
+            <article class="theme-card" style="--theme-bg:#0d1117;--theme-fg:#e6edf3;--theme-accent:#58a6ff"><strong>GitHub Dark</strong><span class="theme-swatch"><i></i><i></i><i></i></span></article>
+            <article class="theme-card" style="--theme-bg:#002b36;--theme-fg:#839496;--theme-accent:#3aaed8"><strong>Solarized Dark</strong><span class="theme-swatch"><i></i><i></i><i></i></span></article>
+            <article class="theme-card" style="--theme-bg:#282a36;--theme-fg:#f8f8f2;--theme-accent:#bd93f9"><strong>Dracula</strong><span class="theme-swatch"><i></i><i></i><i></i></span></article>
+            <article class="theme-card" style="--theme-bg:#272822;--theme-fg:#f8f8f2;--theme-accent:#66d9ef"><strong>Monokai</strong><span class="theme-swatch"><i></i><i></i><i></i></span></article>
+            <article class="theme-card" style="--theme-bg:#2e3440;--theme-fg:#eceff4;--theme-accent:#88c0d0"><strong>Nord</strong><span class="theme-swatch"><i></i><i></i><i></i></span></article>
+        </div>
+        <p class="theme-thanks">Special thanks to <a href="https://github.com/asherweintraub">@asherweintraub</a> for the theme and Settings inspiration in the <a href="https://github.com/asherweintraub/mdviewer">asherweintraub/mdviewer fork</a>, and to <a href="https://github.com/ulfendk">@ulfendk</a> for the Sepia inspiration in the <a href="https://github.com/ulfendk/mdviewer">ulfendk/mdviewer fork</a>.</p>
     </section>
 
     <section class="install reveal">

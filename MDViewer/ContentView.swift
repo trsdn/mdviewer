@@ -57,7 +57,7 @@ private enum DocumentAlert: Identifiable {
 struct ContentView: View {
     let document: MarkdownDocument
     let fileURL: URL?
-    let appearanceMode: AppearanceMode
+    let palette: ThemePalette
     @State private var text: String
     @State private var zoomLevel: Double
     @State private var documentAlert: DocumentAlert?
@@ -70,10 +70,10 @@ struct ContentView: View {
     @State private var resourceDocumentURL: URL?
     @StateObject private var windowState = DocumentWindowState()
 
-    init(document: MarkdownDocument, fileURL: URL?, appearanceMode: AppearanceMode) {
+    init(document: MarkdownDocument, fileURL: URL?, palette: ThemePalette) {
         self.document = document
         self.fileURL = fileURL
-        self.appearanceMode = appearanceMode
+        self.palette = palette
         self._text = State(initialValue: document.text)
         self._zoomLevel = State(initialValue: ZoomPreference.current())
         self._resourceDocumentURL = State(initialValue: fileURL)
@@ -82,12 +82,13 @@ struct ContentView: View {
     var body: some View {
         MarkdownWebView(
             text: text,
-            appearanceMode: appearanceMode,
+            palette: palette,
             zoomLevel: zoomLevel,
             resourceRoot: folderAccess?.rootURL,
             onError: showRenderError,
             onRelativeImages: handleRelativeImages
         )
+        .background(palette.colors.background.swiftUIColor)
         .background(DocumentWindowAccessor(state: windowState))
         .overlay(alignment: .topTrailing) {
             resourceAccessNotice

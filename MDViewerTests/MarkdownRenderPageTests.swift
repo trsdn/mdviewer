@@ -172,24 +172,86 @@ final class MarkdownRenderPageTests: XCTestCase {
         XCTAssertTrue(loaded)
     }
 
-    func testAppearanceAndZoomDoNotRerenderOrReplaceContent() async throws {
+    func testThemeAndZoomDoNotRerenderReplaceContentOrLoseScroll() async throws {
         let webView = try await loadRenderPage()
-        try await render("# Kept", in: webView)
-
-        let before = try await values(
-            "({ count: window.__mdviewerRenderCount, text: document.querySelector('h1').textContent })",
+        webView.frame = CGRect(x: 0, y: 0, width: 800, height: 300)
+        try await render(
+            (["# Kept"] + (1...100).map { "Paragraph \($0)" }).joined(separator: "\n\n"),
             in: webView
         )
-        webView.appearance = NSAppearance(named: .darkAqua)
         webView.pageZoom = 1.4
+        _ = try await webView.evaluateJavaScript(
+            "window.__keptHeading = document.querySelector('h1'); window.scrollTo(0, 240);"
+        )
+
+        let before = try await values(
+            """
+            ({
+                count: window.__mdviewerRenderCount,
+                text: document.querySelector('h1').textContent,
+                scrollY: window.scrollY,
+                location: window.location.href
+            })
+            """,
+            in: webView
+        )
+        let nord = ThemeRegistry.theme(id: "nord", category: .dark)
+        _ = try await webView.callAsyncJavaScript(
+            "return window.applyTheme(theme);",
+            arguments: ["theme": nord.colors.webArguments],
+            in: nil,
+            contentWorld: .page
+        )
+        webView.appearance = NSAppearance(named: .darkAqua)
         let after = try await values(
-            "({ count: window.__mdviewerRenderCount, text: document.querySelector('h1').textContent })",
+            """
+            ({
+                count: window.__mdviewerRenderCount,
+                text: document.querySelector('h1').textContent,
+                sameNode: window.__keptHeading === document.querySelector('h1'),
+                scrollY: window.scrollY,
+                location: window.location.href,
+                cssVariables: Object.fromEntries(
+                    Array.from(document.documentElement.style)
+                        .filter((name) => name.startsWith('--color-'))
+                        .map((name) => [
+                            name,
+                            document.documentElement.style.getPropertyValue(name)
+                        ])
+                )
+            })
+            """,
             in: webView
         )
 
         XCTAssertEqual(int(before, "count"), 1)
         XCTAssertEqual(int(after, "count"), 1)
         XCTAssertEqual(after["text"] as? String, "Kept")
+        XCTAssertTrue(bool(after, "sameNode"))
+        XCTAssertEqual(int(after, "scrollY"), int(before, "scrollY"))
+        XCTAssertEqual(after["location"] as? String, before["location"] as? String)
+        let cssVariables = try XCTUnwrap(after["cssVariables"] as? [String: String])
+        XCTAssertEqual(cssVariables, [
+            "--color-bg": "#2e3440",
+            "--color-fg": "#eceff4",
+            "--color-border": "#4c566a",
+            "--color-code-bg": "#3b4252",
+            "--color-code-fg": "#e5e9f0",
+            "--color-link": "#88c0d0",
+            "--color-blockquote-fg": "#d8dee9",
+            "--color-blockquote-border": "#4c566a",
+            "--color-hr": "#4c566a",
+            "--color-selection-bg": "#434c5e",
+            "--color-selection-fg": "#eceff4",
+            "--color-caret": "#eceff4",
+            "--color-active-line": "#3b4252",
+            "--color-gutter-bg": "#2e3440",
+            "--color-gutter-fg": "#81a1c1",
+            "--color-splitter": "#4c566a",
+            "--color-splitter-hover": "#88c0d0",
+            "--color-search-match": "#5e5a2f",
+            "--color-search-match-selected": "#434c5e"
+        ])
         XCTAssertEqual(webView.pageZoom, 1.4, accuracy: 0.001)
     }
 

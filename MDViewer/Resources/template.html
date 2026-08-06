@@ -11,26 +11,26 @@
     --color-fg: #24292f;
     --color-border: #d0d7de;
     --color-code-bg: #f6f8fa;
+    --color-code-fg: #24292f;
     --color-link: #0969da;
     --color-blockquote-fg: #656d76;
     --color-blockquote-border: #d0d7de;
     --color-hr: #d8dee4;
-}
-
-@media (prefers-color-scheme: dark) {
-    :root {
-        --color-bg: #0d1117;
-        --color-fg: #e6edf3;
-        --color-border: #30363d;
-        --color-code-bg: #161b22;
-        --color-link: #58a6ff;
-        --color-blockquote-fg: #8b949e;
-        --color-blockquote-border: #30363d;
-        --color-hr: #21262d;
-    }
+    --color-selection-bg: #b6d7ff;
+    --color-selection-fg: #24292f;
+    --color-caret: #24292f;
+    --color-active-line: #f6f8fa;
+    --color-gutter-bg: #ffffff;
+    --color-gutter-fg: #656d76;
+    --color-splitter: #d0d7de;
+    --color-splitter-hover: #0969da;
+    --color-search-match: #fff8c5;
+    --color-search-match-selected: #b6d7ff;
 }
 
 * { box-sizing: border-box; }
+
+html { background-color: var(--color-bg); }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
@@ -41,6 +41,17 @@ body {
     margin: 0;
     padding: 32px 48px;
     word-wrap: break-word;
+    caret-color: var(--color-caret);
+}
+
+::selection {
+    color: var(--color-selection-fg);
+    background-color: var(--color-selection-bg);
+}
+
+:focus-visible {
+    outline: 2px solid var(--color-splitter-hover);
+    outline-offset: 2px;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -64,6 +75,7 @@ code {
     font-family: "SF Mono", SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
     font-size: 85%;
     background-color: var(--color-code-bg);
+    color: var(--color-code-fg);
     padding: 0.2em 0.4em;
     border-radius: 6px;
 }
@@ -107,9 +119,9 @@ table {
 
 th, td { padding: 6px 13px; border: 1px solid var(--color-border); }
 th { font-weight: 600; }
-tr:nth-child(2n) { background-color: var(--color-code-bg); }
 img { max-width: 100%; height: auto; }
-input[type="checkbox"] { margin-right: 0.5em; }
+input[type="checkbox"] { margin-right: 0.5em; accent-color: var(--color-link); }
+mark { color: var(--color-selection-fg); background-color: var(--color-search-match); }
 
 @media (max-width: 600px) {
     body { padding: 24px; }
@@ -134,6 +146,30 @@ input[type="checkbox"] { margin-right: 0.5em; }
         'reversed', 'rowspan', 'src', 'start', 'title', 'type'
     ];
     const schemePattern = /^[a-z][a-z0-9+.-]*:/i;
+
+    window.applyTheme = function(theme) {
+        const root = document.documentElement.style;
+        root.setProperty('--color-bg', theme.background);
+        root.setProperty('--color-fg', theme.foreground);
+        root.setProperty('--color-border', theme.border);
+        root.setProperty('--color-code-bg', theme.codeBackground);
+        root.setProperty('--color-code-fg', theme.codeForeground);
+        root.setProperty('--color-link', theme.link);
+        root.setProperty('--color-blockquote-fg', theme.blockquoteForeground);
+        root.setProperty('--color-blockquote-border', theme.blockquoteBorder);
+        root.setProperty('--color-hr', theme.horizontalRule);
+        root.setProperty('--color-selection-bg', theme.selectionBackground);
+        root.setProperty('--color-selection-fg', theme.selectionForeground);
+        root.setProperty('--color-caret', theme.caret);
+        root.setProperty('--color-active-line', theme.activeLine);
+        root.setProperty('--color-gutter-bg', theme.gutterBackground);
+        root.setProperty('--color-gutter-fg', theme.gutterForeground);
+        root.setProperty('--color-splitter', theme.splitter);
+        root.setProperty('--color-splitter-hover', theme.splitterHover);
+        root.setProperty('--color-search-match', theme.searchMatch);
+        root.setProperty('--color-search-match-selected', theme.searchMatchSelected);
+        return theme;
+    };
 
     function isRelativeImage(value) {
         const trimmed = value.trim();
