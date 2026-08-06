@@ -55,6 +55,8 @@ private enum DocumentAlert: Identifiable {
 }
 
 struct ContentView: View {
+    @Environment(\.openDocument) private var openDocument
+
     let document: MarkdownDocument
     let fileURL: URL?
     let palette: ThemePalette
@@ -68,6 +70,10 @@ struct ContentView: View {
     @State private var didRestoreFolderAccess = false
     @State private var resourceAccessGeneration = 0
     @State private var resourceDocumentURL: URL?
+    @State private var siblingTargets = SiblingNavigationTargets.none
+    @State private var navigationFolderAccess: FolderAccessLease?
+    @State private var navigationNeedsFolderAccess = false
+    @State private var isNavigating = false
     @StateObject private var windowState = DocumentWindowState()
 
     init(document: MarkdownDocument, fileURL: URL?, palette: ThemePalette) {
@@ -96,6 +102,7 @@ struct ContentView: View {
         .focusedSceneValue(\.documentCommandActions, commandActions)
         .task(id: fileURL) {
             resetFolderAccess()
+            prepareSiblingNavigation()
         }
         .alert(item: $documentAlert) { alert in
             switch alert {
@@ -112,7 +119,13 @@ struct ContentView: View {
     private var commandActions: DocumentCommandActions {
         DocumentCommandActions(
             canReload: fileURL != nil,
+            canNavigatePrevious: !isNavigating && siblingTargets.previous != nil,
+            canNavigateNext: !isNavigating && siblingTargets.next != nil,
+            canRefreshSiblingNavigation: !isNavigating && fileURL != nil,
             reload: reload,
+            navigatePrevious: { navigate(to: .previous) },
+            navigateNext: { navigate(to: .next) },
+            refreshSiblingNavigation: refreshSiblingNavigation,
             zoomIn: { handleZoom(.zoomIn) },
             zoomOut: { handleZoom(.zoomOut) },
             zoomReset: { handleZoom(.zoomReset) }
@@ -156,12 +169,122 @@ struct ContentView: View {
 
         do {
             text = try MarkdownDocumentLoader.load(from: fileURL)
+            refreshSiblingTargetsAfterReload(for: fileURL)
         } catch {
             documentAlert = .error(
                 title: "Couldn’t Reload Document",
                 message: error.localizedDescription
             )
         }
+    }
+
+    private func prepareSiblingNavigation() {
+        siblingTargets = .none
+        navigationFolderAccess = nil
+        navigationNeedsFolderAccess = false
+        guard let fileURL else { return }
+
+        do {
+            navigationFolderAccess = try FolderAccessStore.shared.restoredAccess(
+                for: fileURL
+            )
+            try SiblingMarkdownNavigation.refresh(
+                &siblingTargets,
+                for: fileURL
+            )
+        } catch {
+            siblingTargets = .none
+            navigationNeedsFolderAccess = true
+        }
+    }
+
+    private func refreshSiblingTargetsAfterReload(for fileURL: URL) {
+        navigationNeedsFolderAccess = !SiblingMarkdownNavigation.refreshAfterReload(
+            &siblingTargets,
+            for: fileURL
+        )
+    }
+
+    private func refreshSiblingNavigation() {
+        guard !isNavigating,
+              let fileURL else { return }
+        isNavigating = true
+
+        Task { @MainActor in
+            defer { isNavigating = false }
+
+            do {
+                if navigationNeedsFolderAccess {
+                    guard let access = try await FolderAccessStore.shared.requestAccess(
+                        for: fileURL,
+                        attachedTo: windowState.window,
+                        purpose: .siblingNavigation
+                    ) else {
+                        return
+                    }
+                    guard self.fileURL == fileURL else { return }
+                    navigationFolderAccess = access
+                }
+
+                try SiblingMarkdownNavigation.refresh(
+                    &siblingTargets,
+                    for: fileURL
+                )
+                navigationNeedsFolderAccess = false
+            } catch {
+                siblingTargets = .none
+                navigationNeedsFolderAccess = true
+                showNavigationError(
+                    title: "Couldn’t Refresh Sibling Navigation",
+                    error: error
+                )
+            }
+        }
+    }
+
+    private func navigate(to direction: SiblingNavigationDirection) {
+        guard !isNavigating, let fileURL else { return }
+        isNavigating = true
+
+        Task { @MainActor in
+            defer { isNavigating = false }
+
+            do {
+                try SiblingMarkdownNavigation.refresh(
+                    &siblingTargets,
+                    for: fileURL
+                )
+            } catch {
+                siblingTargets = .none
+                navigationNeedsFolderAccess = true
+                showNavigationError(
+                    title: "Couldn’t Read Folder",
+                    error: error
+                )
+                return
+            }
+
+            guard let target = siblingTargets.target(for: direction) else {
+                return
+            }
+
+            do {
+                try await openDocument(at: target)
+                windowState.window?.performClose(nil)
+            } catch {
+                showNavigationError(
+                    title: "Couldn’t Open Document",
+                    error: error
+                )
+            }
+        }
+    }
+
+    private func showNavigationError(title: String, error: Error) {
+        documentAlert = .error(
+            title: title,
+            message: error.localizedDescription
+        )
     }
 
     private func showRenderError(_ message: String) {

@@ -16,6 +16,7 @@ A minimal macOS Markdown viewer. No editor, no bloat — just clean rendering wi
 - **Automatic appearance** — System, Light, or Dark mode with separate preferred light and dark themes
 - **Window-scoped zoom** — Cmd+/Cmd- affects only the active window and becomes the default for new windows
 - **Reload** — Cmd+R to refresh after external edits
+- **Sibling navigation** — move through Markdown files in the same folder by filename
 - **Native file handling** — Open, Recent Files, drag & drop
 - **About 1.1 MB total** — no Electron, package manager, or external runtime
 
@@ -46,9 +47,13 @@ xcodebuild -scheme MDViewer -configuration Release build
 
 Choose preferred palettes in **MDViewer > Settings**. System mode follows the current macOS appearance and switches between those preferences. Sepia is a light palette selected in Settings; the existing mode shortcuts remain unchanged.
 
+Choose **View > Refresh Sibling Navigation…** to discover files added to the folder. If macOS restricts folder enumeration, the same command requests read-only folder access. Opening a document never prompts solely for navigation, and Reload also refreshes sibling availability.
+
 | Action | Shortcut |
 |--------|----------|
 | Reload | `Cmd R` |
+| Previous Markdown File | `Cmd Option Left Arrow` |
+| Next Markdown File | `Cmd Option Right Arrow` |
 | Zoom In | `Cmd +` |
 | Zoom Out | `Cmd -` |
 | Actual Size | `Cmd 0` |

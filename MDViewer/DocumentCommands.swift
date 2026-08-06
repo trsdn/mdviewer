@@ -2,7 +2,13 @@ import SwiftUI
 
 struct DocumentCommandActions {
     let canReload: Bool
+    let canNavigatePrevious: Bool
+    let canNavigateNext: Bool
+    let canRefreshSiblingNavigation: Bool
     let reload: () -> Void
+    let navigatePrevious: () -> Void
+    let navigateNext: () -> Void
+    let refreshSiblingNavigation: () -> Void
     let zoomIn: () -> Void
     let zoomOut: () -> Void
     let zoomReset: () -> Void
@@ -24,6 +30,25 @@ struct DocumentCommands: Commands {
 
     var body: some Commands {
         CommandGroup(after: .toolbar) {
+            Button("Previous Markdown File") {
+                actions?.navigatePrevious()
+            }
+            .keyboardShortcut(.leftArrow, modifiers: [.command, .option])
+            .disabled(actions?.canNavigatePrevious != true)
+
+            Button("Next Markdown File") {
+                actions?.navigateNext()
+            }
+            .keyboardShortcut(.rightArrow, modifiers: [.command, .option])
+            .disabled(actions?.canNavigateNext != true)
+
+            Button("Refresh Sibling Navigation…") {
+                actions?.refreshSiblingNavigation()
+            }
+            .disabled(actions?.canRefreshSiblingNavigation != true)
+
+            Divider()
+
             Button("Reload") {
                 actions?.reload()
             }

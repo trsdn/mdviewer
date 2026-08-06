@@ -69,6 +69,43 @@ final class MDViewerUITests: XCTestCase {
         XCTAssertEqual(secondPreview.value as? String, secondZoom)
     }
 
+    func testSiblingNavigationCommandsArePresentAndDisabledWithoutDocument() {
+        let app = XCUIApplication()
+        app.launchArguments += ["-ApplePersistenceIgnoreState", "YES"]
+        app.launch()
+
+        let previous = app.menuItems["Previous Markdown File"]
+        let next = app.menuItems["Next Markdown File"]
+        let refresh = app.menuItems["Refresh Sibling Navigation…"]
+
+        XCTAssertTrue(previous.exists)
+        XCTAssertTrue(next.exists)
+        XCTAssertTrue(refresh.exists)
+        XCTAssertFalse(previous.isEnabled)
+        XCTAssertFalse(next.isEnabled)
+        XCTAssertFalse(refresh.isEnabled)
+    }
+
+    func testRefreshSiblingNavigationIsAvailableWithoutKnownSiblings() async throws {
+        let documentURL = temporaryDirectory.appendingPathComponent("Only.md")
+        try Data("# Only".utf8).write(to: documentURL)
+
+        let app = XCUIApplication()
+        app.launchArguments += ["-ApplePersistenceIgnoreState", "YES"]
+        app.launch()
+        try await openDocuments([documentURL])
+
+        let window = app.windows.matching(
+            NSPredicate(format: "title CONTAINS %@", "Only")
+        ).firstMatch
+        XCTAssertTrue(window.waitForExistence(timeout: 5))
+        window.click()
+
+        XCTAssertFalse(app.menuItems["Previous Markdown File"].isEnabled)
+        XCTAssertFalse(app.menuItems["Next Markdown File"].isEnabled)
+        XCTAssertTrue(app.menuItems["Refresh Sibling Navigation…"].isEnabled)
+    }
+
     private func openDocuments(_ urls: [URL]) async throws {
         let bundleIdentifier = "com.torstenmahr.MDViewer"
         let appURL = try XCTUnwrap(

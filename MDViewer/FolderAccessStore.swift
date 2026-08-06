@@ -15,6 +15,29 @@ enum FolderAccessError: LocalizedError {
     }
 }
 
+enum FolderAccessPurpose {
+    case relativeImages
+    case siblingNavigation
+
+    func title(for documentURL: URL) -> String {
+        switch self {
+        case .relativeImages:
+            return "Grant Read-Only Folder Access"
+        case .siblingNavigation:
+            return "Enable Markdown File Navigation"
+        }
+    }
+
+    func message(for documentURL: URL) -> String {
+        switch self {
+        case .relativeImages:
+            return "Choose the folder containing \(documentURL.lastPathComponent) to load its relative images."
+        case .siblingNavigation:
+            return "Choose the folder containing \(documentURL.lastPathComponent) to navigate between Markdown files."
+        }
+    }
+}
+
 final class FolderAccessLease {
     let rootURL: URL
     private let securityScopedURL: URL
@@ -88,12 +111,13 @@ final class FolderAccessStore {
 
     func requestAccess(
         for documentURL: URL,
-        attachedTo window: NSWindow?
+        attachedTo window: NSWindow?,
+        purpose: FolderAccessPurpose = .relativeImages
     ) async throws -> FolderAccessLease? {
         let expectedRoot = canonicalFolder(for: documentURL)
         let panel = NSOpenPanel()
-        panel.title = "Grant Read-Only Folder Access"
-        panel.message = "Choose the folder containing \(documentURL.lastPathComponent) to load its relative images."
+        panel.title = purpose.title(for: documentURL)
+        panel.message = purpose.message(for: documentURL)
         panel.prompt = "Grant Access"
         panel.directoryURL = expectedRoot
         panel.canChooseFiles = false

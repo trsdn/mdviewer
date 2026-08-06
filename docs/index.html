@@ -33,7 +33,7 @@
   "applicationCategory": "DeveloperApplication",
   "description": "A minimal macOS Markdown viewer with secure rendering and curated reading themes.",
   "fileSize": "1.1MB",
-  "softwareVersion": "1.2.0",
+  "softwareVersion": "1.3.0",
   "license": "https://opensource.org/licenses/MIT",
   "url": "https://trsdn.github.io/mdviewer/",
   "downloadUrl": "https://github.com/trsdn/mdviewer/releases/latest",
@@ -674,7 +674,7 @@ footer a:hover { color: var(--fg); }
             <article class="feature">
                 <p class="feature-num">03</p>
                 <h3>Native macOS</h3>
-                <p>Built with SwiftUI and WKWebView. Open files, Recent Files, drag &amp; drop, window management &mdash; it just works.</p>
+                <p>Built with SwiftUI and WKWebView. Open files, Recent Files, drag &amp; drop, and move through sibling Markdown files by filename. Use Refresh Sibling Navigation to discover folder changes; folder access is requested only from that explicit command.</p>
             </article>
             <article class="feature">
                 <p class="feature-num">04</p>
@@ -721,6 +721,14 @@ footer a:hover { color: var(--fg); }
     <section class="shortcuts reveal">
         <h2>Shortcuts</h2>
         <ul class="shortcut-list">
+            <li class="shortcut-item">
+                <span class="shortcut-action">Previous Markdown file</span>
+                <span class="shortcut-keys"><kbd class="key">&#8984;</kbd><kbd class="key">&#8997;</kbd><kbd class="key">&larr;</kbd></span>
+            </li>
+            <li class="shortcut-item">
+                <span class="shortcut-action">Next Markdown file</span>
+                <span class="shortcut-keys"><kbd class="key">&#8984;</kbd><kbd class="key">&#8997;</kbd><kbd class="key">&rarr;</kbd></span>
+            </li>
             <li class="shortcut-item">
                 <span class="shortcut-action">Zoom in</span>
                 <span class="shortcut-keys"><kbd class="key">&#8984;</kbd><kbd class="key">+</kbd></span>
