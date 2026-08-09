@@ -80,7 +80,12 @@ staples both, and runs Gatekeeper checks. It does not publish a GitHub release.
 ## Security
 
 MDViewer is an App Sandbox application with read-only user-selected file access
-and app-scoped security bookmarks. It has no network entitlement.
+and app-scoped security bookmarks. The render page cannot reach the network:
+its Content Security Policy sets `connect-src`, `worker-src`, `frame-src`,
+`object-src`, and `form-action` to `none`. The sandboxed WebKit process itself
+still requires the network-client entitlement to launch at all (a WebKit/macOS
+requirement independent of whether any request is ever made); it is not usable
+by rendered content.
 
 - CSP blocks networking, workers, frames, objects, forms, media, and remote code.
 - Markdown HTML is sanitized before any enhancement runs.

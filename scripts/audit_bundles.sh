@@ -62,8 +62,16 @@ for app in "$lite_app" "$full_app"; do
   if [[ -n "$entitlements" ]]; then
     grep -q 'com.apple.security.app-sandbox' <<<"$entitlements" \
       || fail "$app is missing App Sandbox"
+    # WKWebView's separate WebContent process cannot launch under App Sandbox
+    # without this entitlement, even though the render page itself never
+    # makes a network request: the page's CSP sets `connect-src 'none'` (and
+    # every other network-capable directive to 'none'), so no in-page code
+    # can ever reach the network. Without this entitlement the WebContent
+    # process crashes on launch with "Application does not have permission to
+    # communicate with network resources," and every document fails to
+    # render. See MDViewer.entitlements.
     grep -q 'com.apple.security.network.client' <<<"$entitlements" \
-      && fail "$app unexpectedly has a network client entitlement"
+      || fail "$app is missing the network client entitlement WKWebView requires to launch its WebContent process under App Sandbox"
     grep -q 'com.apple.security.files.user-selected.read-write' <<<"$entitlements" \
       && fail "$app unexpectedly has read-write file access"
   fi
