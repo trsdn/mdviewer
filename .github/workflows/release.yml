@@ -1,0 +1,139 @@
+name: Release macOS Lite and Full
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag to build, for example v2.0.0
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  macos-dmgs:
+    name: Build signed and notarized Lite and Full DMGs
+    runs-on: macos-15
+    timeout-minutes: 45
+    steps:
+      - name: Resolve release metadata
+        id: release
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME}"
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            tag="${{ inputs.tag }}"
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "version=${tag#v}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.release.outputs.tag }}
+          fetch-depth: 0
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Import Developer ID certificate
+        shell: bash
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PWD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+        run: |
+          set -euo pipefail
+          mkdir -p .ci
+          cert_file="$GITHUB_WORKSPACE/.ci/developer-id.p12"
+          ca_file="$GITHUB_WORKSPACE/.ci/DeveloperIDG2CA.cer"
+          keychain_file="$GITHUB_WORKSPACE/.ci/build.keychain-db"
+          keychain_password="$(openssl rand -base64 32)"
+          echo "$MACOS_CERTIFICATE" | base64 --decode > "$cert_file"
+          curl -sL \
+            "https://www.apple.com/certificateauthority/DeveloperIDG2CA.cer" \
+            -o "$ca_file"
+          security create-keychain -p "$keychain_password" "$keychain_file"
+          security set-keychain-settings -lut 21600 "$keychain_file"
+          security unlock-keychain -p "$keychain_password" "$keychain_file"
+          security import "$ca_file" -k "$keychain_file" -T /usr/bin/codesign
+          security import "$cert_file" \
+            -P "$MACOS_CERTIFICATE_PWD" -A -t cert -f pkcs12 \
+            -k "$keychain_file"
+          security set-key-partition-list \
+            -S apple-tool:,apple: \
+            -k "$keychain_password" \
+            "$keychain_file"
+          security list-keychains -d user -s \
+            "$keychain_file" \
+            $(security list-keychains -d user | tr -d '"')
+          identity="$(
+            security find-identity -v -p codesigning "$keychain_file" \
+              | grep 'Developer ID Application' \
+              | head -1 \
+              | sed 's/.*"\(.*\)"/\1/'
+          )"
+          echo "CODE_SIGN_IDENTITY=$identity" >> "$GITHUB_ENV"
+          echo "TEAM_ID=${{ secrets.APPLE_TEAM_ID }}" >> "$GITHUB_ENV"
+          echo "KEYCHAIN_FILE=$keychain_file" >> "$GITHUB_ENV"
+
+      - name: Verify assets, build, and audit both editions
+        run: |
+          chmod +x scripts/*.sh
+          scripts/vendor_web_assets.sh --check
+          scripts/build_release.sh
+          for edition in Lite Full; do
+            EDITION="$edition" \
+              DMG_PATH="dist/MDViewer-$edition-macos.dmg" \
+              scripts/make_dmg.sh
+          done
+
+      - name: Notarize both DMGs
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          APPLE_APP_PASSWORD: ${{ secrets.APPLE_APP_PASSWORD }}
+        run: |
+          for edition in Lite Full; do
+            DMG_PATH="dist/MDViewer-$edition-macos.dmg" \
+              scripts/notarize_dmg.sh
+          done
+
+      - name: Cleanup keychain
+        if: always()
+        run: |
+          if [[ -n "${KEYCHAIN_FILE:-}" ]]; then
+            security delete-keychain "$KEYCHAIN_FILE" 2>/dev/null || true
+          fi
+          rm -rf .ci
+
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: MDViewer-${{ steps.release.outputs.version }}-macos
+          path: |
+            dist/MDViewer-Lite-macos.dmg
+            dist/MDViewer-Lite-macos.dmg.sha256
+            dist/MDViewer-Full-macos.dmg
+            dist/MDViewer-Full-macos.dmg.sha256
+
+      - name: Attach assets to GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.release.outputs.tag }}
+          RELEASE_VERSION: ${{ steps.release.outputs.version }}
+        run: |
+          if ! gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" \
+              --title "MDViewer ${RELEASE_VERSION}" \
+              --notes "Full is recommended. Lite is the minimum-footprint edition. Both are signed, notarized, offline, and share the same app identity."
+          fi
+          gh release upload "$RELEASE_TAG" \
+            dist/MDViewer-Lite-macos.dmg \
+            dist/MDViewer-Lite-macos.dmg.sha256 \
+            dist/MDViewer-Full-macos.dmg \
+            dist/MDViewer-Full-macos.dmg.sha256 \
+            --clobber
