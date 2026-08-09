@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MDViewer — Minimal macOS Markdown Viewer</title>
-<meta name="description" content="A lightweight macOS Markdown viewer with secure GitHub-style rendering, curated reading themes, and no external runtime.">
+<title>MDViewer 2.0 — Lite and Full macOS Markdown Viewer</title>
+<meta name="description" content="A native secure macOS Markdown viewer in Lite and Full editions, with offline rendering, navigation, themes, highlighting, and optional Mermaid support.">
 <meta name="keywords" content="markdown viewer, macOS, markdown reader, sepia, themes, dark mode, lightweight, SwiftUI, markdown app">
 <meta name="author" content="Torsten Mahr">
 <meta name="theme-color" content="#0a0a0b">
@@ -15,14 +15,14 @@
 
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://trsdn.github.io/mdviewer/">
-<meta property="og:title" content="MDViewer — Minimal macOS Markdown Viewer">
-<meta property="og:description" content="A lightweight macOS Markdown viewer with secure GitHub-style rendering, curated reading themes, and no external runtime.">
+<meta property="og:title" content="MDViewer 2.0 — Lite and Full">
+<meta property="og:description" content="One native secure Markdown viewer, two physically separated editions. Full adds lazy Mermaid, broad highlighting, and YAML metadata.">
 <meta property="og:site_name" content="MDViewer">
 <meta property="og:locale" content="en_US">
 
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="MDViewer — Minimal Markdown Viewer for macOS">
-<meta name="twitter:description" content="Secure GitHub-style rendering, curated reading themes, sub-50ms cold start, and no external runtime.">
+<meta name="twitter:title" content="MDViewer 2.0 — Lite and Full for macOS">
+<meta name="twitter:description" content="Secure offline Markdown rendering, native navigation, and two editions from one shared codebase.">
 
 <script type="application/ld+json">
 {
@@ -31,9 +31,9 @@
   "name": "MDViewer",
   "operatingSystem": "macOS 13.0+",
   "applicationCategory": "DeveloperApplication",
-  "description": "A minimal macOS Markdown viewer with secure rendering and curated reading themes.",
-  "fileSize": "1.1MB",
-  "softwareVersion": "1.3.0",
+  "description": "A native macOS Markdown viewer with secure offline rendering in Lite and Full editions.",
+  "fileSize": "5.6MB",
+  "softwareVersion": "2.0.0",
   "license": "https://opensource.org/licenses/MIT",
   "url": "https://trsdn.github.io/mdviewer/",
   "downloadUrl": "https://github.com/trsdn/mdviewer/releases/latest",
@@ -624,7 +624,7 @@ footer a:hover { color: var(--fg); }
     <section class="hero" id="hero">
         <div class="hero-icon" role="img" aria-label="MDViewer app icon">md</div>
         <h1>Read markdown,<br><em>nothing else.</em></h1>
-        <p class="hero-sub">A lightweight macOS Markdown viewer. Secure GitHub-style rendering, curated reading themes, and no external runtime. Less than 100 MB RAM.</p>
+        <p class="hero-sub">MDViewer 2.0 is one native, secure codebase in two editions. Full is recommended; Lite keeps the minimum footprint.</p>
         <div class="hero-cta">
             <a href="https://github.com/trsdn/mdviewer/releases/latest" class="btn-primary">Download for macOS</a>
             <a href="https://github.com/trsdn/mdviewer" class="btn-ghost" target="_blank" rel="noopener">View source &rarr;</a>
@@ -637,20 +637,20 @@ footer a:hover { color: var(--fg); }
     <section class="stats reveal" aria-label="Performance metrics">
         <div class="stats-inner">
             <div class="stat">
-                <div class="stat-value">~1.1<span class="unit"> MB</span></div>
-                <div class="stat-label">App size</div>
+                <div class="stat-value">5.6<span class="unit"> MB</span></div>
+                <div class="stat-label">Full app</div>
             </div>
             <div class="stat">
-                <div class="stat-value">&lt;100<span class="unit"> MB</span></div>
-                <div class="stat-label">Memory</div>
+                <div class="stat-value">2.5<span class="unit"> MB</span></div>
+                <div class="stat-label">Lite app</div>
             </div>
             <div class="stat">
-                <div class="stat-value">&lt;50<span class="unit"> ms</span></div>
-                <div class="stat-label">Cold start</div>
+                <div class="stat-value">2.1<span class="unit"> MB</span></div>
+                <div class="stat-label">Full DMG</div>
             </div>
             <div class="stat">
-                <div class="stat-value">~610<span class="unit"> KB</span></div>
-                <div class="stat-label">Download</div>
+                <div class="stat-value">1.1<span class="unit"> MB</span></div>
+                <div class="stat-label">Lite DMG</div>
             </div>
         </div>
     </section>
@@ -658,28 +658,28 @@ footer a:hover { color: var(--fg); }
     <section class="features reveal" id="features">
         <div class="features-header">
             <p class="label">Features</p>
-            <h2>One thing, done right.</h2>
+            <h2>Native reading, from minimal to complete.</h2>
         </div>
         <div class="feature-grid">
             <article class="feature">
                 <p class="feature-num">01</p>
-                <h3>GitHub-style rendering</h3>
-                <p>Markdown parsed with marked.js and sanitized with DOMPurify. Tables, task lists, and code render in a locked-down native WebKit preview.</p>
+                <h3>Lite and Full</h3>
+                <p>Both editions come from one shared source tree and use the same app identity. Lite physically excludes all Full-only modules.</p>
             </article>
             <article class="feature">
                 <p class="feature-num">02</p>
-                <h3>Curated reading themes</h3>
-                <p>Choose separate light and dark palettes. System mode follows macOS automatically, while Light and Dark stay one shortcut away.</p>
+                <h3>Fast native navigation</h3>
+                <p>Window-scoped Find, current-folder Quick Open, an outline popover, secure internal links, sibling navigation, and native folder events without polling.</p>
             </article>
             <article class="feature">
                 <p class="feature-num">03</p>
-                <h3>Native macOS</h3>
-                <p>Built with SwiftUI and WKWebView. Open files, Recent Files, drag &amp; drop, and move through sibling Markdown files by filename. Use Refresh Sibling Navigation to discover folder changes; folder access is requested only from that explicit command.</p>
+                <h3>Hardened shared renderer</h3>
+                <p>Footnotes, alerts, task lists, local image zoom, code controls, printing, curated themes, strict CSP, DOMPurify, and confined read-only local resources.</p>
             </article>
             <article class="feature">
                 <p class="feature-num">04</p>
-                <h3>No Electron. No runtime.</h3>
-                <p>About 1.1 MB total. No bundled browser, Node.js, package manager, or third-party native framework.</p>
+                <h3>Full, loaded only when needed</h3>
+                <p>Full lazily imports broad highlight.js, safe YAML frontmatter, complete offline Mermaid ESM chunks, and svg-pan-zoom. Ordinary Markdown initializes none of them.</p>
             </article>
         </div>
     </section>
@@ -708,19 +708,46 @@ footer a:hover { color: var(--fg); }
     </section>
 
     <section class="install reveal" id="install">
+        <p class="label">Editions</p>
+        <h2>Full is recommended. Lite is the minimum.</h2>
+        <p>Full supports complete offline Mermaid diagrams, broad syntax highlighting, and safe YAML metadata cards. Lite uses a 10,060-byte custom Prism build for Swift, JavaScript/TypeScript, JSON, Bash, Python, Rust, HTML, and CSS.</p>
+        <p>Installing either edition replaces the other because both use <code>com.torstenmahr.MDViewer</code>.</p>
+    </section>
+
+    <section class="install reveal">
+        <p class="label">Security and dependencies</p>
+        <h2>Offline by construction.</h2>
+        <p>The sandbox grants read-only user-selected access and no network entitlement. CSP blocks networking, workers, frames, objects, forms, remote code, and eval. Internal links, local images, bundled modules, YAML, and Mermaid SVG each pass dedicated confinement and sanitization checks.</p>
+        <p>Dependencies are pinned with checksums and edition membership: marked 18.0.9, DOMPurify 3.4.12, marked-footnote 1.4.0, Prism 1.30.0 (Lite), highlight.js 11.11.1, js-yaml 4.1.0, Mermaid 11.12.0, and svg-pan-zoom 3.6.2 (Full).</p>
+    </section>
+
+    <section class="install reveal">
         <p class="label">Install</p>
         <h2>Build from source</h2>
         <div class="code-block" role="code">
             <span class="comment"># requires Xcode command line tools</span><br>
             <span class="cmd">brew install xcodegen</span><br>
             <span class="cmd">xcodegen generate</span><br>
-            <span class="cmd">xcodebuild -scheme MDViewer -configuration Release build</span>
+            <span class="cmd">xcodebuild -scheme MDViewer-Lite -configuration Release build</span><br>
+            <span class="cmd">xcodebuild -scheme MDViewer-Full -configuration Release build</span>
         </div>
     </section>
 
     <section class="shortcuts reveal">
         <h2>Shortcuts</h2>
         <ul class="shortcut-list">
+            <li class="shortcut-item">
+                <span class="shortcut-action">Find / next / previous</span>
+                <span class="shortcut-keys"><kbd class="key">&#8984;F</kbd><kbd class="key">&#8984;G</kbd><kbd class="key">&#8984;&#8679;G</kbd></span>
+            </li>
+            <li class="shortcut-item">
+                <span class="shortcut-action">Quick Open current folder</span>
+                <span class="shortcut-keys"><kbd class="key">&#8984;</kbd><kbd class="key">K</kbd></span>
+            </li>
+            <li class="shortcut-item">
+                <span class="shortcut-action">Document outline</span>
+                <span class="shortcut-keys"><kbd class="key">&#8984;</kbd><kbd class="key">&#8679;</kbd><kbd class="key">O</kbd></span>
+            </li>
             <li class="shortcut-item">
                 <span class="shortcut-action">Previous Markdown file</span>
                 <span class="shortcut-keys"><kbd class="key">&#8984;</kbd><kbd class="key">&#8997;</kbd><kbd class="key">&larr;</kbd></span>
@@ -765,6 +792,7 @@ footer a:hover { color: var(--fg); }
     <span>MIT License &middot; macOS 13.0+</span>
     <div class="footer-links">
         <a href="https://trsdn.github.io/mdviewerplus/">MDViewer+</a>
+        <a href="THIRD-PARTY-NOTICES.html">Notices</a>
         <a href="https://github.com/trsdn/mdviewer" target="_blank" rel="noopener">GitHub</a>
         <a href="https://github.com/trsdn/mdviewer/releases" target="_blank" rel="noopener">Releases</a>
     </div>

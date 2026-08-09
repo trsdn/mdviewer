@@ -1,6 +1,13 @@
 import Foundation
 import WebKit
 
+/// Serves the two kinds of resources the render page may request:
+///
+/// 1. local images inside the authorized document folder, and
+/// 2. in MDViewer Full, the allowlisted ES modules bundled with the app.
+///
+/// Anything else fails. The handler never reads from arbitrary paths and never
+/// performs network access.
 final class MarkdownResourceSchemeHandler: NSObject, WKURLSchemeHandler {
     private let lock = NSLock()
     private var rootURL: URL?
@@ -28,6 +35,24 @@ final class MarkdownResourceSchemeHandler: NSObject, WKURLSchemeHandler {
                     || urlSchemeTask.request.httpMethod == "GET",
                   let requestURL = urlSchemeTask.request.url else {
                 throw MarkdownResourceError.invalidPath
+            }
+
+            if MarkdownWebModuleResolver.modulePath(for: requestURL) != nil {
+                let module = try MarkdownWebModuleResolver.resolve(requestURL)
+                let data = try Data(
+                    contentsOf: module.fileURL,
+                    options: .mappedIfSafe
+                )
+                let response = URLResponse(
+                    url: requestURL,
+                    mimeType: module.mimeType,
+                    expectedContentLength: module.byteCount,
+                    textEncodingName: "utf-8"
+                )
+                urlSchemeTask.didReceive(response)
+                urlSchemeTask.didReceive(data)
+                urlSchemeTask.didFinish()
+                return
             }
 
             let image = try MarkdownResourceResolver.resolveImage(

@@ -90,6 +90,211 @@ final class MarkdownRenderPageTests: XCTestCase {
         XCTAssertTrue(bool(result, "checkboxChecked"))
     }
 
+    func testSharedFootnotesAlertsOutlineImagesAndCodeControls() async throws {
+        let webView = try await loadRenderPage()
+        try await render(
+            """
+            # Café
+            ## Duplicate
+            ## Duplicate
+
+            > [!WARNING]
+            > Keep a backup.
+
+            - [ ] Pending
+
+            Here is a note[^one].
+
+            [^one]: Footnote text.
+
+            ![Local diagram](images/diagram.png)
+
+            ```swift
+            let greeting = "hello"
+            ```
+            """,
+            in: webView
+        )
+
+        let result = try await values(
+            """
+            (() => {
+                document.querySelector('img.md-zoomable')?.click();
+                return {
+                    headingIDs: Array.from(document.querySelectorAll('h1, h2'))
+                        .filter((node) => !node.closest('.footnotes'))
+                        .map((node) => node.id),
+                    alertLabel: document.querySelector('.md-alert-label')?.textContent || '',
+                    taskDisabled: document.querySelector('.task-list-item input')?.disabled === true,
+                    footnote: document.querySelectorAll('.footnotes [data-footnote-backref]').length,
+                    codeFigure: document.querySelectorAll('figure.md-code').length,
+                    codeLanguage: document.querySelector('.md-code-language')?.textContent || '',
+                    codeButtons: document.querySelectorAll('.md-code-actions button').length,
+                    exactSource: document.querySelector('figure.md-code code')?.dataset.mdviewerSource || '',
+                    highlighted: document.querySelectorAll('figure.md-code code span').length,
+                    imageViewerOpen: document.querySelector('.md-image-viewer')?.hidden === false
+                };
+            })()
+            """,
+            in: webView
+        )
+
+        XCTAssertEqual(result["headingIDs"] as? [String], ["café", "duplicate", "duplicate-1"])
+        XCTAssertTrue((result["alertLabel"] as? String)?.contains("Warning") == true)
+        XCTAssertTrue(bool(result, "taskDisabled"))
+        XCTAssertEqual(int(result, "footnote"), 1)
+        XCTAssertEqual(int(result, "codeFigure"), 1)
+        XCTAssertEqual(result["codeLanguage"] as? String, "swift")
+        XCTAssertEqual(int(result, "codeButtons"), 3)
+        XCTAssertEqual(result["exactSource"] as? String, "let greeting = \"hello\"\n")
+        XCTAssertGreaterThan(int(result, "highlighted"), 0)
+        XCTAssertTrue(bool(result, "imageViewerOpen"))
+    }
+
+    #if MDVIEWER_FULL
+    func testFullFeaturesLoadOnlyForMatchingContent() async throws {
+        let webView = try await loadRenderPage()
+        try await render("# Ordinary", in: webView)
+        var diagnostics = try await values(
+            """
+            ({...window.__mdviewerFullDiagnostics})
+            """,
+            in: webView
+        )
+        XCTAssertFalse(bool(diagnostics, "highlightLoaded"))
+        XCTAssertFalse(bool(diagnostics, "yamlLoaded"))
+        XCTAssertFalse(bool(diagnostics, "mermaidLoaded"))
+        XCTAssertFalse(bool(diagnostics, "panZoomLoaded"))
+
+        try await render(
+            """
+            ---
+            title: Secure metadata
+            tags:
+              - native
+              - offline
+            ---
+            # Full
+
+            ```typescript
+            const value: number = 42;
+            ```
+            """,
+            in: webView
+        )
+        diagnostics = try await values(
+            """
+            ({
+                ...window.__mdviewerFullDiagnostics,
+                card: document.querySelector('.md-frontmatter')?.textContent || '',
+                title: document.querySelector('h1')?.textContent || '',
+                highlighted: document.querySelectorAll('.hljs span').length
+            })
+            """,
+            in: webView
+        )
+        XCTAssertTrue(bool(diagnostics, "highlightLoaded"))
+        XCTAssertTrue(bool(diagnostics, "yamlLoaded"))
+        XCTAssertFalse(bool(diagnostics, "mermaidLoaded"))
+        XCTAssertTrue((diagnostics["card"] as? String)?.contains("Secure metadata") == true)
+        XCTAssertEqual(diagnostics["title"] as? String, "Full")
+        XCTAssertGreaterThan(int(diagnostics, "highlighted"), 0)
+    }
+
+    func testFullRejectsUnsafeFrontmatterAndRendersMermaidOffline() async throws {
+        final class PrintReadySignal: NSObject, WKScriptMessageHandler {
+            var received: (() -> Void)?
+            func userContentController(
+                _ userContentController: WKUserContentController,
+                didReceive message: WKScriptMessage
+            ) {
+                received?()
+            }
+        }
+        let signal = PrintReadySignal()
+        let configuration = WKWebViewConfiguration()
+        configuration.userContentController.add(signal, name: "printReady")
+        let webView = try await loadRenderPage(configuration: configuration)
+        try await render(
+            """
+            ---
+            unsafe: !!js/function "() => 1"
+            ---
+            # Body remains
+
+            ```mermaid
+            flowchart LR
+              A[Safe] --> B[Offline]
+            ```
+            """,
+            in: webView
+        )
+
+        // Mirrors MarkdownWebView.Coordinator.preparePrint: dispatched on a
+        // later turn of the event loop and reported through a script message
+        // rather than awaited as the direct result of the JS-evaluation call,
+        // because awaiting Full's heavy Mermaid dynamic-import chain directly
+        // as a `callAsyncJavaScript`/`evaluateJavaScript` return value can
+        // fail at the WebKit layer.
+        let printReady = expectation(description: "print preparation completed")
+        signal.received = { printReady.fulfill() }
+        _ = try await webView.evaluateJavaScript(
+            """
+            setTimeout(() => {
+                window.prepareForPrint().then(
+                    () => window.webkit.messageHandlers.printReady.postMessage('ok'),
+                    (error) => window.webkit.messageHandlers.printReady
+                        .postMessage('error:' + String(error))
+                );
+            }, 0);
+            """
+        )
+        await fulfillment(of: [printReady], timeout: 15)
+
+        var rendered = false
+        for _ in 0..<100 {
+            rendered = try await webView.evaluateJavaScript(
+                "document.querySelector('.md-diagram')?.dataset.state === 'rendered'"
+            ) as? Bool == true
+            if rendered { break }
+            try await Task.sleep(nanoseconds: 50_000_000)
+        }
+
+        let result = try await values(
+            """
+            ({
+                body: document.querySelector('h1')?.textContent || '',
+                metadataError: document.querySelector('.md-frontmatter-error')?.textContent || '',
+                diagramState: document.querySelector('.md-diagram')?.dataset.state || '',
+                diagramError: document.querySelector('.md-diagram-error')?.textContent || '',
+                rendered: document.querySelector('.md-diagram')?.dataset.state === 'rendered',
+                svg: document.querySelectorAll('.md-diagram svg').length,
+                foreignObjects: document.querySelectorAll('.md-diagram foreignObject').length,
+                eventAttributes: document.querySelectorAll('.md-diagram [onload], .md-diagram [onclick], .md-diagram [onerror]').length,
+                mermaidLoaded: window.__mdviewerFullDiagnostics.mermaidLoaded,
+                panZoomLoaded: window.__mdviewerFullDiagnostics.panZoomLoaded
+            })
+            """,
+            in: webView
+        )
+        XCTAssertEqual(result["body"] as? String, "Body remains")
+        XCTAssertFalse((result["metadataError"] as? String)?.isEmpty ?? true)
+        XCTAssertTrue(
+            bool(result, "rendered"),
+            "\(result["diagramState"] ?? ""): \(result["diagramError"] ?? "")"
+        )
+        XCTAssertEqual(
+            int(result, "svg"),
+            1,
+            "\(result["diagramState"] ?? ""): \(result["diagramError"] ?? "")"
+        )
+        XCTAssertEqual(int(result, "foreignObjects"), 0)
+        XCTAssertEqual(int(result, "eventAttributes"), 0)
+        XCTAssertTrue(bool(result, "mermaidLoaded"))
+        XCTAssertTrue(bool(result, "panZoomLoaded"))
+    }
+    #endif
+
     func testLinksFragmentsAndImagesFollowPolicy() async throws {
         let webView = try await loadRenderPage()
         try await render(
@@ -136,7 +341,10 @@ final class MarkdownRenderPageTests: XCTestCase {
         XCTAssertEqual(result["web"] as? String, "https://example.com")
         XCTAssertEqual(result["mail"] as? String, "mailto:test@example.com")
         XCTAssertEqual(result["fragment"] as? String, "#section")
-        XCTAssertTrue(result["relative"] is NSNull)
+        XCTAssertEqual(
+            result["relative"] as? String,
+            "mdviewer-document://open/docs%2Fnext.md"
+        )
         XCTAssertTrue(result["remote"] is NSNull)
         XCTAssertEqual(result["local"] as? String, "images/image.png")
         XCTAssertTrue(result["traversal"] is NSNull)
@@ -274,6 +482,14 @@ final class MarkdownRenderPageTests: XCTestCase {
     ) async throws -> WKWebView {
         let config = configuration ?? WKWebViewConfiguration()
         config.websiteDataStore = .nonPersistent()
+        if config.urlSchemeHandler(
+            forURLScheme: MarkdownResourceResolver.scheme
+        ) == nil {
+            config.setURLSchemeHandler(
+                MarkdownResourceSchemeHandler(authorizedRoot: nil),
+                forURLScheme: MarkdownResourceResolver.scheme
+            )
+        }
         let webView = WKWebView(frame: .zero, configuration: config)
         let waiter = NavigationWaiter()
         webView.navigationDelegate = waiter
@@ -285,7 +501,7 @@ final class MarkdownRenderPageTests: XCTestCase {
             do {
                 webView.loadHTMLString(
                     try MarkdownRenderPage.makeHTML(),
-                    baseURL: baseURL
+                    baseURL: baseURL ?? MarkdownResourceResolver.baseURL
                 )
             } catch {
                 continuation.resume(throwing: error)

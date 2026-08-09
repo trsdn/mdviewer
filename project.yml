@@ -10,13 +10,47 @@ schemes:
   MDViewer:
     build:
       targets:
-        MDViewer: all
+        MDViewerLite: all
     run:
       config: Debug
     test:
       config: Debug
       targets:
-        - MDViewerTests
+        - MDViewerLiteTests
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
+
+  MDViewer-Lite:
+    build:
+      targets:
+        MDViewerLite: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - MDViewerLiteTests
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release
+
+  MDViewer-Full:
+    build:
+      targets:
+        MDViewerFull: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - MDViewerFullTests
     profile:
       config: Release
     analyze:
@@ -27,24 +61,52 @@ schemes:
   MDViewerUITests:
     build:
       targets:
-        MDViewer: all
+        MDViewerLite: all
     test:
       config: Debug
       targets:
         - MDViewerUITests
 
-targets:
-  MDViewer:
+settings:
+  base:
+    PRODUCT_BUNDLE_IDENTIFIER: com.torstenmahr.MDViewer
+    PRODUCT_NAME: MDViewer
+    PRODUCT_MODULE_NAME: MDViewer
+    MARKETING_VERSION: "2.0.0"
+    CURRENT_PROJECT_VERSION: "5"
+    INFOPLIST_FILE: MDViewer/Info.plist
+    GENERATE_INFOPLIST_FILE: false
+    SWIFT_VERSION: "5.9"
+    MACOSX_DEPLOYMENT_TARGET: "13.0"
+    CODE_SIGN_STYLE: Automatic
+    CODE_SIGN_ENTITLEMENTS: MDViewer/MDViewer.entitlements
+    ENABLE_APP_SANDBOX: true
+  configs:
+    Release:
+      CODE_SIGN_INJECT_BASE_ENTITLEMENTS: false
+      ENABLE_HARDENED_RUNTIME: true
+      SWIFT_OPTIMIZATION_LEVEL: "-Osize"
+      DEAD_CODE_STRIPPING: true
+      STRIP_INSTALLED_PRODUCT: true
+      STRIP_SWIFT_SYMBOLS: true
+      STRIP_STYLE: "non-global"
+
+targetTemplates:
+  app:
     type: application
     platform: macOS
     sources:
-      - MDViewer
+      - path: MDViewer
+        excludes:
+          - LiteResources
+          - FullResources
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.torstenmahr.MDViewer
         PRODUCT_NAME: MDViewer
-        MARKETING_VERSION: "1.3.0"
-        CURRENT_PROJECT_VERSION: "4"
+        PRODUCT_MODULE_NAME: MDViewer
+        MARKETING_VERSION: "2.0.0"
+        CURRENT_PROJECT_VERSION: "5"
         INFOPLIST_FILE: MDViewer/Info.plist
         GENERATE_INFOPLIST_FILE: false
         SWIFT_VERSION: "5.9"
@@ -62,20 +124,65 @@ targets:
           STRIP_SWIFT_SYMBOLS: true
           STRIP_STYLE: "non-global"
 
-  MDViewerTests:
+  tests:
     type: bundle.unit-test
     platform: macOS
     sources:
       - MDViewerTests
-    dependencies:
-      - target: MDViewer
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: com.torstenmahr.MDViewerTests
+        PRODUCT_MODULE_NAME: MDViewerTests
         GENERATE_INFOPLIST_FILE: true
         SWIFT_VERSION: "5.9"
+
+targets:
+  MDViewerLite:
+    templates:
+      - app
+    sources:
+      - path: MDViewer/LiteResources
+    settings:
+      base:
+        MDVIEWER_EDITION: lite
+        MDVIEWER_DISPLAY_NAME: MDViewer Lite
+
+  MDViewerFull:
+    templates:
+      - app
+    sources:
+      - path: MDViewer/FullResources
+        excludes:
+          - WebModules
+      - path: MDViewer/FullResources/WebModules
+        type: folder
+    settings:
+      base:
+        MDVIEWER_EDITION: full
+        MDVIEWER_DISPLAY_NAME: MDViewer Full
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) MDVIEWER_FULL"
+
+  MDViewerLiteTests:
+    templates:
+      - tests
+    dependencies:
+      - target: MDViewerLite
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.torstenmahr.MDViewerLiteTests
         TEST_HOST: "$(BUILT_PRODUCTS_DIR)/MDViewer.app/Contents/MacOS/MDViewer"
         BUNDLE_LOADER: "$(TEST_HOST)"
+
+  MDViewerFullTests:
+    templates:
+      - tests
+    dependencies:
+      - target: MDViewerFull
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.torstenmahr.MDViewerFullTests
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/MDViewer.app/Contents/MacOS/MDViewer"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+        SWIFT_ACTIVE_COMPILATION_CONDITIONS: "$(inherited) MDVIEWER_FULL"
 
   MDViewerUITests:
     type: bundle.ui-testing
@@ -83,10 +190,12 @@ targets:
     sources:
       - MDViewerUITests
     dependencies:
-      - target: MDViewer
+      - target: MDViewerLite
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.torstenmahr.MDViewerUITests
+        PRODUCT_NAME: MDViewerUITests
+        PRODUCT_MODULE_NAME: MDViewerUITests
         GENERATE_INFOPLIST_FILE: true
         SWIFT_VERSION: "5.9"
-        TEST_TARGET_NAME: MDViewer
+        TEST_TARGET_NAME: MDViewerLite

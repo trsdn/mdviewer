@@ -15,3 +15,6 @@ dist/
 
 # Claude
 .claude/
+
+# Vendoring toolchain
+vendor/node_modules/

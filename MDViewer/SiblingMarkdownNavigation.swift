@@ -22,33 +22,14 @@ struct SiblingNavigationTargets: Equatable {
 }
 
 enum SiblingMarkdownNavigation {
-    private static let markdownExtensions: Set<String> = [
-        "md", "markdown", "mdown", "mkd"
-    ]
-
     static func markdownFiles(
         in directoryURL: URL,
         fileManager: FileManager = .default
     ) throws -> [URL] {
-        let resourceKeys: Set<URLResourceKey> = [.isHiddenKey, .isRegularFileKey]
-        let entries = try fileManager.contentsOfDirectory(
-            at: directoryURL,
-            includingPropertiesForKeys: Array(resourceKeys),
-            options: []
+        try MarkdownFileCatalog.files(
+            in: directoryURL,
+            fileManager: fileManager
         )
-
-        return try entries.filter { url in
-            guard !url.lastPathComponent.hasPrefix("."),
-                  markdownExtensions.contains(url.pathExtension.lowercased())
-            else {
-                return false
-            }
-
-            let values = try url.resourceValues(forKeys: resourceKeys)
-            return values.isHidden != true && values.isRegularFile == true
-        }
-        .map(canonical)
-        .sorted(by: filenamePrecedes)
     }
 
     static func targets(
@@ -59,10 +40,10 @@ enum SiblingMarkdownNavigation {
             in: documentURL.deletingLastPathComponent(),
             fileManager: fileManager
         )
-        let canonicalDocumentURL = canonical(documentURL)
+        let canonicalDocumentURL = MarkdownFileCatalog.canonical(documentURL)
 
         guard let index = files.firstIndex(where: {
-            canonical($0) == canonicalDocumentURL
+            MarkdownFileCatalog.canonical($0) == canonicalDocumentURL
         }) else {
             return .none
         }
@@ -106,21 +87,5 @@ enum SiblingMarkdownNavigation {
             currentTargets = .none
             return false
         }
-    }
-
-    private static func filenamePrecedes(_ lhs: URL, _ rhs: URL) -> Bool {
-        let lhsName = lhs.lastPathComponent
-        let rhsName = rhs.lastPathComponent
-        let lhsFolded = Array(lhsName.lowercased().utf8)
-        let rhsFolded = Array(rhsName.lowercased().utf8)
-
-        if lhsFolded == rhsFolded {
-            return lhsName.utf8.lexicographicallyPrecedes(rhsName.utf8)
-        }
-        return lhsFolded.lexicographicallyPrecedes(rhsFolded)
-    }
-
-    private static func canonical(_ url: URL) -> URL {
-        url.standardizedFileURL.resolvingSymlinksInPath()
     }
 }

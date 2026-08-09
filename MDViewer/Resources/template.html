@@ -3,8 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy"
-      content="default-src 'none'; script-src 'nonce-{{CSP_NONCE}}'; style-src 'nonce-{{CSP_NONCE}}'; img-src mdviewer-resource:; media-src 'none'; connect-src 'none'; object-src 'none'; frame-src 'none'; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="{{CSP_POLICY}}">
 <style nonce="{{CSP_NONCE}}">
 :root {
     --color-bg: #ffffff;
@@ -26,6 +25,22 @@
     --color-splitter-hover: #0969da;
     --color-search-match: #fff8c5;
     --color-search-match-selected: #b6d7ff;
+
+    --syntax-keyword: #cf222e;
+    --syntax-string: #0a3069;
+    --syntax-number: #0550ae;
+    --syntax-comment: #6e7781;
+    --syntax-function: #8250df;
+    --syntax-type: #953800;
+    --syntax-variable: #24292f;
+    --syntax-punctuation: #57606a;
+    --alert-note: #0969da;
+    --alert-tip: #1a7f37;
+    --alert-important: #8250df;
+    --alert-warning: #9a6700;
+    --alert-caution: #cf222e;
+
+    --mono-font: "SF Mono", SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
 }
 
 * { box-sizing: border-box; }
@@ -72,7 +87,7 @@ a { color: var(--color-link); text-decoration: none; }
 a:hover { text-decoration: underline; }
 
 code {
-    font-family: "SF Mono", SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+    font-family: var(--mono-font);
     font-size: 85%;
     background-color: var(--color-code-bg);
     color: var(--color-code-fg);
@@ -123,153 +138,358 @@ img { max-width: 100%; height: auto; }
 input[type="checkbox"] { margin-right: 0.5em; accent-color: var(--color-link); }
 mark { color: var(--color-selection-fg); background-color: var(--color-search-match); }
 
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+    border: 0;
+}
+
+/* ---------- GitHub alerts (issue #20) ---------- */
+
+.md-alert {
+    margin: 0 0 16px 0;
+    padding: 8px 16px;
+    border-left: 0.25em solid var(--md-alert-color, var(--color-border));
+    border-radius: 0 6px 6px 0;
+    background-color: var(--color-active-line);
+    color: var(--color-fg);
+}
+
+.md-alert > :last-child { margin-bottom: 0; }
+
+.md-alert-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
+    margin: 0 0 8px 0;
+    font-weight: 600;
+    color: var(--md-alert-color, var(--color-fg));
+}
+
+.md-alert-label svg {
+    flex: none;
+    width: 1em;
+    height: 1em;
+    fill: currentColor;
+}
+
+.md-alert-note { --md-alert-color: var(--alert-note); }
+.md-alert-tip { --md-alert-color: var(--alert-tip); }
+.md-alert-important { --md-alert-color: var(--alert-important); }
+.md-alert-warning { --md-alert-color: var(--alert-warning); }
+.md-alert-caution { --md-alert-color: var(--alert-caution); }
+
+/* ---------- Task lists (issue #20) ---------- */
+
+ul.contains-task-list { list-style: none; padding-left: 1.4em; }
+ul.contains-task-list ul.contains-task-list { padding-left: 1.6em; }
+li.task-list-item { position: relative; }
+li.task-list-item > input[type="checkbox"] {
+    margin-left: -1.4em;
+    vertical-align: middle;
+    opacity: 1;
+}
+
+/* ---------- Footnotes (issue #12) ---------- */
+
+.footnotes {
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid var(--color-border);
+    font-size: 90%;
+    color: var(--color-blockquote-fg);
+}
+
+.footnotes ol { padding-left: 1.5em; }
+.footnotes li:target { background-color: var(--color-search-match); border-radius: 4px; }
+sup a[data-footnote-ref] { padding: 0 0.15em; }
+sup a[data-footnote-ref]:target { background-color: var(--color-search-match); border-radius: 4px; }
+a[data-footnote-backref] { text-decoration: none; padding: 0 0.25em; }
+
+/* ---------- Code block controls (issue #22) ---------- */
+
+figure.md-code {
+    margin: 0 0 16px 0;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    overflow: hidden;
+    background-color: var(--color-code-bg);
+}
+
+figure.md-code > figcaption {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 8px 4px 12px;
+    border-bottom: 1px solid var(--color-border);
+    background-color: var(--color-active-line);
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--color-gutter-fg);
+}
+
+.md-code-language {
+    font-family: var(--mono-font);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-right: auto;
+}
+
+.md-code-actions { display: flex; gap: 4px; align-items: center; }
+
+.md-code-button {
+    font: inherit;
+    font-size: 12px;
+    color: var(--color-fg);
+    background-color: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    padding: 1px 8px;
+    cursor: default;
+}
+
+.md-code-button:hover { border-color: var(--color-splitter-hover); }
+.md-code-button[aria-pressed="true"] {
+    background-color: var(--color-search-match);
+    border-color: var(--color-splitter-hover);
+}
+
+.md-code-status {
+    font-size: 12px;
+    min-width: 5.5em;
+    text-align: right;
+    color: var(--color-gutter-fg);
+}
+
+figure.md-code > .md-code-body { display: flex; align-items: stretch; }
+
+.md-code-gutter {
+    display: none;
+    flex: none;
+    padding: 16px 0 16px 12px;
+    font-family: var(--mono-font);
+    font-size: 85%;
+    line-height: 1.45;
+    text-align: right;
+    color: var(--color-gutter-fg);
+    background-color: var(--color-gutter-bg);
+    border-right: 1px solid var(--color-border);
+    user-select: none;
+}
+
+.md-code-gutter > span { display: block; padding-right: 8px; }
+
+figure.md-code[data-lines="on"] .md-code-gutter { display: block; }
+figure.md-code > .md-code-body > pre { flex: 1 1 auto; margin: 0; border-radius: 0; border: 0; min-width: 0; }
+figure.md-code[data-wrap="on"] > .md-code-body > pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* ---------- Shared highlighting palette (issues #13 and #17) ---------- */
+
+.token.comment, .token.prolog, .token.cdata, .hljs-comment, .hljs-quote {
+    color: var(--syntax-comment);
+    font-style: italic;
+}
+.token.keyword, .token.atrule, .token.important, .token.rule,
+.hljs-keyword, .hljs-selector-tag, .hljs-literal, .hljs-doctag,
+.hljs-meta .hljs-keyword {
+    color: var(--syntax-keyword);
+}
+.token.string, .token.char, .token.attr-value, .token.regex,
+.hljs-string, .hljs-regexp, .hljs-addition, .hljs-attribute,
+.hljs-meta .hljs-string {
+    color: var(--syntax-string);
+}
+.token.number, .token.boolean, .token.constant, .token.symbol,
+.hljs-number, .hljs-literal.hljs-number, .hljs-bullet, .hljs-link {
+    color: var(--syntax-number);
+}
+.token.function, .token.class-name, .token.selector,
+.hljs-title, .hljs-title.function_, .hljs-section, .hljs-name,
+.hljs-selector-id, .hljs-selector-class {
+    color: var(--syntax-function);
+}
+.token.builtin, .token.tag, .token.attr-name, .token.property,
+.hljs-type, .hljs-built_in, .hljs-class .hljs-title, .hljs-tag {
+    color: var(--syntax-type);
+}
+.token.variable, .token.parameter, .hljs-variable, .hljs-template-variable,
+.hljs-params, .hljs-attr {
+    color: var(--syntax-variable);
+}
+.token.punctuation, .token.operator, .token.entity, .token.url,
+.hljs-punctuation, .hljs-operator, .hljs-subst {
+    color: var(--syntax-punctuation);
+}
+.token.deleted, .hljs-deletion { color: var(--alert-caution); }
+.token.inserted { color: var(--alert-tip); }
+.token.bold, .hljs-strong { font-weight: 600; }
+.token.italic, .hljs-emphasis { font-style: italic; }
+
+/* ---------- Frontmatter metadata card (issue #18, Full only) ---------- */
+
+.md-frontmatter {
+    margin: 0 0 24px 0;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background-color: var(--color-active-line);
+    font-size: 90%;
+}
+
+.md-frontmatter > summary {
+    padding: 6px 12px;
+    cursor: default;
+    font-weight: 600;
+    color: var(--color-gutter-fg);
+}
+
+.md-frontmatter dl {
+    margin: 0;
+    padding: 0 12px 10px 12px;
+    display: grid;
+    grid-template-columns: minmax(6em, max-content) 1fr;
+    gap: 2px 12px;
+}
+
+.md-frontmatter dt { font-weight: 600; color: var(--color-gutter-fg); }
+.md-frontmatter dd { margin: 0; overflow-wrap: anywhere; }
+.md-frontmatter .md-frontmatter-error { color: var(--alert-caution); padding: 0 12px 10px; }
+.md-frontmatter ul { margin: 0; padding-left: 1.2em; }
+
+/* ---------- Diagrams (issue #16, Full only) ---------- */
+
+.md-diagram {
+    margin: 0 0 16px 0;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    background-color: var(--color-code-bg);
+    overflow: hidden;
+}
+
+.md-diagram-toolbar {
+    display: flex;
+    gap: 4px;
+    align-items: center;
+    padding: 4px 8px;
+    border-bottom: 1px solid var(--color-border);
+    background-color: var(--color-active-line);
+    font-size: 12px;
+}
+
+.md-diagram-toolbar .md-diagram-title {
+    margin-right: auto;
+    color: var(--color-gutter-fg);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.md-diagram-surface {
+    position: relative;
+    min-height: 60px;
+    padding: 8px;
+    touch-action: none;
+}
+
+.md-diagram-surface svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+.md-diagram-pending { padding: 12px; color: var(--color-gutter-fg); font-size: 90%; }
+
+.md-diagram-error {
+    margin: 0;
+    padding: 8px 12px;
+    color: var(--alert-caution);
+    font-size: 90%;
+    border-top: 1px solid var(--color-border);
+}
+
+/* ---------- Image viewer (issue #21) ---------- */
+
+img.md-zoomable { cursor: zoom-in; }
+
+.md-image-viewer {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--color-bg);
+}
+
+.md-image-viewer[hidden] { display: none; }
+
+.md-image-viewer-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--color-border);
+    background-color: var(--color-active-line);
+    font-size: 12px;
+}
+
+.md-image-viewer-caption {
+    margin-right: auto;
+    color: var(--color-gutter-fg);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 50%;
+}
+
+.md-image-viewer-stage {
+    flex: 1 1 auto;
+    overflow: hidden;
+    position: relative;
+    touch-action: none;
+    cursor: grab;
+}
+
+.md-image-viewer-stage.md-panning { cursor: grabbing; }
+
+.md-image-viewer-stage img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    max-width: none;
+    transform-origin: 0 0;
+    user-select: none;
+    -webkit-user-drag: none;
+}
+
 @media (max-width: 600px) {
     body { padding: 24px; }
+}
+
+@media print {
+    body { padding: 0; }
+    .md-code-actions,
+    .md-code-status,
+    .md-diagram-toolbar,
+    .md-image-viewer { display: none !important; }
+    figure.md-code { break-inside: avoid; border-color: #999999; }
+    figure.md-code > .md-code-body > pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+    figure.md-code > figcaption { background: none; }
+    .md-diagram { break-inside: avoid; border-color: #999999; }
+    .md-alert { break-inside: avoid; }
+    .footnotes { break-before: auto; }
+    a[data-footnote-backref] { display: none; }
+    .md-frontmatter > summary { list-style: none; }
 }
 </style>
 </head>
 <body>
 <main id="content"></main>
+<script nonce="{{CSP_NONCE}}">window.__MDVIEWER_CONFIG__ = {{RENDER_CONFIG_JSON}};</script>
 <script nonce="{{CSP_NONCE}}">{{MARKED_JS}}</script>
 <script nonce="{{CSP_NONCE}}">{{DOMPURIFY_JS}}</script>
-<script nonce="{{CSP_NONCE}}">
-    const allowedTags = [
-        'a', 'abbr', 'b', 'blockquote', 'br', 'code', 'dd', 'del', 'details',
-        'div', 'dl', 'dt', 'em', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr',
-        'i', 'img', 'input', 'kbd', 'li', 'mark', 'ol', 'p', 'pre', 'q',
-        's', 'samp', 'small', 'span', 'strong', 'sub', 'summary', 'sup',
-        'table', 'tbody', 'td', 'tfoot', 'th', 'thead', 'time', 'tr', 'ul',
-        'var'
-    ];
-    const allowedAttributes = [
-        'alt', 'checked', 'colspan', 'datetime', 'disabled', 'href', 'open',
-        'reversed', 'rowspan', 'src', 'start', 'title', 'type'
-    ];
-    const schemePattern = /^[a-z][a-z0-9+.-]*:/i;
-
-    window.applyTheme = function(theme) {
-        const root = document.documentElement.style;
-        root.setProperty('--color-bg', theme.background);
-        root.setProperty('--color-fg', theme.foreground);
-        root.setProperty('--color-border', theme.border);
-        root.setProperty('--color-code-bg', theme.codeBackground);
-        root.setProperty('--color-code-fg', theme.codeForeground);
-        root.setProperty('--color-link', theme.link);
-        root.setProperty('--color-blockquote-fg', theme.blockquoteForeground);
-        root.setProperty('--color-blockquote-border', theme.blockquoteBorder);
-        root.setProperty('--color-hr', theme.horizontalRule);
-        root.setProperty('--color-selection-bg', theme.selectionBackground);
-        root.setProperty('--color-selection-fg', theme.selectionForeground);
-        root.setProperty('--color-caret', theme.caret);
-        root.setProperty('--color-active-line', theme.activeLine);
-        root.setProperty('--color-gutter-bg', theme.gutterBackground);
-        root.setProperty('--color-gutter-fg', theme.gutterForeground);
-        root.setProperty('--color-splitter', theme.splitter);
-        root.setProperty('--color-splitter-hover', theme.splitterHover);
-        root.setProperty('--color-search-match', theme.searchMatch);
-        root.setProperty('--color-search-match-selected', theme.searchMatchSelected);
-        return theme;
-    };
-
-    function isRelativeImage(value) {
-        const trimmed = value.trim();
-        if (trimmed.length === 0
-            || trimmed.startsWith('/')
-            || trimmed.startsWith('//')
-            || trimmed.startsWith('#')
-            || trimmed.includes('?')
-            || trimmed.includes('#')
-            || trimmed.includes('\\')
-            || schemePattern.test(trimmed)) {
-            return false;
-        }
-
-        try {
-            const decoded = decodeURIComponent(trimmed);
-            return !decoded.split('/').includes('..')
-                && !decoded.includes('\0')
-                && /\.(png|jpe?g|gif|webp)$/i.test(decoded);
-        } catch {
-            return false;
-        }
-    }
-
-    function isSafeLink(value) {
-        const trimmed = value.trim();
-        return /^#[^\s]*$/.test(trimmed)
-            || /^(https?:|mailto:)/i.test(trimmed);
-    }
-
-    DOMPurify.addHook('uponSanitizeAttribute', (node, data) => {
-        const tagName = node.nodeName.toLowerCase();
-        const attributeName = data.attrName.toLowerCase();
-
-        if (tagName === 'a' && attributeName === 'href') {
-            data.keepAttr = isSafeLink(data.attrValue);
-        } else if (tagName === 'img' && attributeName === 'src') {
-            data.keepAttr = isRelativeImage(data.attrValue);
-        }
-    });
-
-    function normalizeTaskCheckboxes(fragment) {
-        for (const input of fragment.querySelectorAll('input')) {
-            if ((input.getAttribute('type') || '').toLowerCase() !== 'checkbox') {
-                input.remove();
-                continue;
-            }
-
-            const checked = input.hasAttribute('checked');
-            for (const attribute of Array.from(input.attributes)) {
-                input.removeAttribute(attribute.name);
-            }
-            input.setAttribute('type', 'checkbox');
-            input.setAttribute('disabled', '');
-            if (checked) input.setAttribute('checked', '');
-        }
-    }
-
-    function assignHeadingIDs(fragment) {
-        const used = new Set();
-        for (const heading of fragment.querySelectorAll('h1, h2, h3, h4, h5, h6')) {
-            const base = heading.textContent
-                .toLowerCase()
-                .trim()
-                .replace(/[^\p{L}\p{N}\s_-]/gu, '')
-                .replace(/\s+/g, '-') || 'section';
-            let id = base;
-            let suffix = 1;
-            while (used.has(id)) {
-                id = `${base}-${suffix++}`;
-            }
-            used.add(id);
-            heading.id = id;
-        }
-    }
-
-    window.__mdviewerRenderCount = 0;
-    window.renderMarkdown = function(markdown) {
-        const rawHTML = marked.parse(markdown, { gfm: true });
-        const fragment = DOMPurify.sanitize(rawHTML, {
-            ALLOWED_TAGS: allowedTags,
-            ALLOWED_ATTR: allowedAttributes,
-            ALLOW_ARIA_ATTR: false,
-            ALLOW_DATA_ATTR: false,
-            RETURN_DOM_FRAGMENT: true
-        });
-
-        normalizeTaskCheckboxes(fragment);
-        assignHeadingIDs(fragment);
-
-        const content = document.getElementById('content');
-        content.replaceChildren(fragment);
-        window.__mdviewerRenderCount += 1;
-
-        return {
-            images: Array.from(content.querySelectorAll('img[src]'))
-                .map((image) => image.getAttribute('src')),
-            renderCount: window.__mdviewerRenderCount
-        };
-    };
-</script>
+<script nonce="{{CSP_NONCE}}">{{MARKED_FOOTNOTE_JS}}</script>
+<script nonce="{{CSP_NONCE}}">window.Prism = window.Prism || {}; window.Prism.manual = true;</script>
+<script nonce="{{CSP_NONCE}}">{{HIGHLIGHTER_JS}}</script>
+<script nonce="{{CSP_NONCE}}">{{RENDERER_JS}}</script>
+<script nonce="{{CSP_NONCE}}">{{EDITION_RENDERER_JS}}</script>
 </body>
 </html>

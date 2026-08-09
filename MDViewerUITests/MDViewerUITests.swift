@@ -106,6 +106,51 @@ final class MDViewerUITests: XCTestCase {
         XCTAssertTrue(app.menuItems["Refresh Sibling Navigation…"].isEnabled)
     }
 
+    func testFindAndOutlineAreWindowScoped() async throws {
+        let documentURL = temporaryDirectory.appendingPathComponent("Navigation.md")
+        try Data(
+            """
+            # First Heading
+
+            Body text.
+
+            ## Second Heading
+            """.utf8
+        ).write(to: documentURL)
+
+        let app = XCUIApplication()
+        app.launchArguments += ["-ApplePersistenceIgnoreState", "YES"]
+        app.launch()
+        try await openDocuments([documentURL])
+
+        let window = app.windows.matching(
+            NSPredicate(format: "title CONTAINS %@", "Navigation")
+        ).firstMatch
+        XCTAssertTrue(window.waitForExistence(timeout: 5))
+        window.click()
+
+        app.typeKey("f", modifierFlags: .command)
+        let findField = window.textFields["documentFindField"]
+        XCTAssertTrue(findField.waitForExistence(timeout: 3))
+        findField.typeText("Second")
+        let status = window.staticTexts["documentFindStatus"]
+        XCTAssertTrue(status.waitForExistence(timeout: 3))
+        let matchExpectation = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "label == %@", "Match found"),
+            object: status
+        )
+        await fulfillment(of: [matchExpectation], timeout: 3)
+        app.typeKey(.escape, modifierFlags: [])
+        XCTAssertFalse(findField.exists)
+
+        app.typeKey("o", modifierFlags: [.command, .shift])
+        XCTAssertTrue(
+            app.textFields["documentOutlineField"].waitForExistence(timeout: 3)
+        )
+        XCTAssertTrue(app.staticTexts["First Heading"].exists)
+        XCTAssertTrue(app.staticTexts["Second Heading"].exists)
+    }
+
     private func openDocuments(_ urls: [URL]) async throws {
         let bundleIdentifier = "com.torstenmahr.MDViewer"
         let appURL = try XCTUnwrap(

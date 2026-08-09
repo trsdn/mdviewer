@@ -120,11 +120,67 @@ struct ThemeColors: Equatable {
     }
 }
 
+/// Semantic tokens shared by both editions' highlighters and by GitHub alerts.
+///
+/// Lite renders through the custom Prism build and Full renders through
+/// highlight.js, but both map onto exactly these variables so highlighted code
+/// and alerts look the same in every palette and in print.
+enum ThemeSyntaxToken: String, CaseIterable {
+    case keyword
+    case string
+    case number
+    case comment
+    case function
+    case type
+    case variable
+    case punctuation
+    case alertNote
+    case alertTip
+    case alertImportant
+    case alertWarning
+    case alertCaution
+}
+
+struct ThemeSyntaxColors: Equatable {
+    private let values: [ThemeSyntaxToken: ThemeColorValue]
+
+    init(_ values: [ThemeSyntaxToken: String]) {
+        precondition(
+            Set(values.keys) == Set(ThemeSyntaxToken.allCases),
+            "Every palette must define every syntax token."
+        )
+        self.values = values.mapValues(ThemeColorValue.init)
+    }
+
+    subscript(token: ThemeSyntaxToken) -> ThemeColorValue {
+        values[token]!
+    }
+
+    var webArguments: [String: String] {
+        Dictionary(
+            uniqueKeysWithValues: ThemeSyntaxToken.allCases.map {
+                ($0.rawValue, self[$0].hex)
+            }
+        )
+    }
+}
+
 struct ThemePalette: Identifiable, Equatable {
     let id: String
     let name: String
     let category: ThemeCategory
     let colors: ThemeColors
+    let syntax: ThemeSyntaxColors
+
+    /// Payload handed to the render page's `applyTheme`.
+    var webArguments: [String: Any] {
+        [
+            "id": id,
+            "category": category.rawValue,
+            "colors": colors.webArguments,
+            "syntax": syntax.webArguments
+        ]
+    }
 }
 
 enum ThemeRegistry {
@@ -294,7 +350,70 @@ enum ThemeRegistry {
                 splitterHover: color(.splitterHover),
                 searchMatch: color(.searchMatch),
                 searchMatchSelected: color(.searchMatchSelected)
-            )
+            ),
+            syntax: ThemeSyntaxColors(syntaxValues[id]!)
         )
     }
+
+    /// Curated, accessibility-checked syntax and alert accents per palette.
+    /// Values are chosen to stay legible against each palette's code
+    /// background in light, dark and printed output.
+    private static let syntaxValues: [String: [ThemeSyntaxToken: String]] = [
+        "github-light": [
+            .keyword: "#cf222e", .string: "#0a3069", .number: "#0550ae",
+            .comment: "#6e7781", .function: "#8250df", .type: "#953800",
+            .variable: "#24292f", .punctuation: "#57606a",
+            .alertNote: "#0969da", .alertTip: "#1a7f37", .alertImportant: "#8250df",
+            .alertWarning: "#9a6700", .alertCaution: "#cf222e"
+        ],
+        "solarized-light": [
+            .keyword: "#859900", .string: "#2aa198", .number: "#d33682",
+            .comment: "#93a1a1", .function: "#268bd2", .type: "#b58900",
+            .variable: "#586e75", .punctuation: "#657b83",
+            .alertNote: "#268bd2", .alertTip: "#859900", .alertImportant: "#6c71c4",
+            .alertWarning: "#b58900", .alertCaution: "#dc322f"
+        ],
+        "sepia": [
+            .keyword: "#8a3324", .string: "#4a6b3a", .number: "#7a5200",
+            .comment: "#8a7b64", .function: "#5b4a8a", .type: "#7a4b12",
+            .variable: "#3e3629", .punctuation: "#6b5d4f",
+            .alertNote: "#2f5f8a", .alertTip: "#3f6b34", .alertImportant: "#5b4a8a",
+            .alertWarning: "#8a6100", .alertCaution: "#8a3324"
+        ],
+        "github-dark": [
+            .keyword: "#ff7b72", .string: "#a5d6ff", .number: "#79c0ff",
+            .comment: "#8b949e", .function: "#d2a8ff", .type: "#ffa657",
+            .variable: "#e6edf3", .punctuation: "#c9d1d9",
+            .alertNote: "#58a6ff", .alertTip: "#3fb950", .alertImportant: "#a371f7",
+            .alertWarning: "#d29922", .alertCaution: "#f85149"
+        ],
+        "solarized-dark": [
+            .keyword: "#859900", .string: "#2aa198", .number: "#d33682",
+            .comment: "#657b83", .function: "#268bd2", .type: "#b58900",
+            .variable: "#93a1a1", .punctuation: "#839496",
+            .alertNote: "#268bd2", .alertTip: "#859900", .alertImportant: "#6c71c4",
+            .alertWarning: "#b58900", .alertCaution: "#dc322f"
+        ],
+        "dracula": [
+            .keyword: "#ff79c6", .string: "#f1fa8c", .number: "#bd93f9",
+            .comment: "#8f96b3", .function: "#50fa7b", .type: "#8be9fd",
+            .variable: "#f8f8f2", .punctuation: "#e2e2dc",
+            .alertNote: "#8be9fd", .alertTip: "#50fa7b", .alertImportant: "#bd93f9",
+            .alertWarning: "#ffb86c", .alertCaution: "#ff5555"
+        ],
+        "monokai": [
+            .keyword: "#f92672", .string: "#e6db74", .number: "#ae81ff",
+            .comment: "#9d9a86", .function: "#a6e22e", .type: "#66d9ef",
+            .variable: "#f8f8f2", .punctuation: "#e4e4de",
+            .alertNote: "#66d9ef", .alertTip: "#a6e22e", .alertImportant: "#ae81ff",
+            .alertWarning: "#fd971f", .alertCaution: "#f92672"
+        ],
+        "nord": [
+            .keyword: "#81a1c1", .string: "#a3be8c", .number: "#b48ead",
+            .comment: "#9aa5b5", .function: "#88c0d0", .type: "#8fbcbb",
+            .variable: "#eceff4", .punctuation: "#d8dee9",
+            .alertNote: "#88c0d0", .alertTip: "#a3be8c", .alertImportant: "#b48ead",
+            .alertWarning: "#ebcb8b", .alertCaution: "#bf616a"
+        ]
+    ]
 }

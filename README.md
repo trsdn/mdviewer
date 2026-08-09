@@ -1,92 +1,121 @@
-# MDViewer
+# MDViewer 2.0
 
-A minimal macOS Markdown viewer. No editor, no bloat — just clean rendering with curated reading themes.
+A native, read-only macOS Markdown viewer with two editions built from one
+shared Swift and renderer codebase.
 
 ![macOS](https://img.shields.io/badge/macOS-13.0+-black?logo=apple)
 ![Swift](https://img.shields.io/badge/Swift-5.9-F05138?logo=swift&logoColor=white)
 ![License](https://img.shields.io/badge/License-MIT-blue)
-![Size](https://img.shields.io/badge/App_Size-~1.1_MB-2ea44f)
-![Memory](https://img.shields.io/badge/Memory-<100MB-2ea44f)
 
-## Features
+## Editions
 
-- **Secure GitHub-flavored rendering** via [marked.js](https://marked.js.org) and [DOMPurify](https://github.com/cure53/DOMPurify)
-- **Private local images** — optional read-only folder access for relative PNG, JPEG, GIF, and WebP images
-- **Curated themes** — GitHub, Solarized, Sepia, Dracula, Monokai, and Nord palettes
-- **Automatic appearance** — System, Light, or Dark mode with separate preferred light and dark themes
-- **Window-scoped zoom** — Cmd+/Cmd- affects only the active window and becomes the default for new windows
-- **Reload** — Cmd+R to refresh after external edits
-- **Sibling navigation** — move through Markdown files in the same folder by filename
-- **Native file handling** — Open, Recent Files, drag & drop
-- **About 1.1 MB total** — no Electron, package manager, or external runtime
+| Edition | Recommended for | Release app | Compressed DMG |
+| --- | --- | ---: | ---: |
+| **Full** (recommended) | Broad highlighting, YAML metadata, and complete offline Mermaid support | 5.6 MB | 2.1 MB |
+| **Lite** | Minimum footprint with compact Prism highlighting | 2.5 MB | 1.1 MB |
 
-## Performance
+Sizes were measured from unsigned universal Release builds produced by the
+2.0 scripts. Both editions use bundle identifier `com.torstenmahr.MDViewer`, so
+installing one replaces the other rather than registering competing Markdown
+handlers. Settings shows the installed edition, version, and build.
 
-| Metric | Value |
-|--------|-------|
-| App size | ~1.1 MB |
-| Download (DMG) | ~610 KB |
-| Cold start | < 50 ms |
-| Memory | < 100 MB |
+## Shared features
 
-## Install
+- GitHub-flavored Markdown through pinned marked.js and DOMPurify
+- Footnotes, GitHub alerts, accessible read-only task lists, and heading anchors
+- Native window-scoped Find, current-folder Quick Open, and outline popover
+- Secure relative links to authorized Markdown files
+- Native debounced folder events for sibling navigation; no polling
+- Local PNG, JPEG, GIF, and WebP images through a confined custom resource loader
+- Dependency-free image inspection with fit, zoom, pan, and original size
+- Code language labels plus Copy, wrap, and line-number controls
+- GitHub, Solarized, Sepia, Dracula, Monokai, and Nord reading palettes
+- Window-scoped zoom, reload, Recent Files, drag and drop, and printing
 
-Download the latest signed and notarized `.dmg` from [Releases](https://github.com/trsdn/mdviewer/releases) or build from source:
+Lite includes a 10,060-byte custom Prism build for Swift, JavaScript,
+TypeScript, JSON, Bash, Python, Rust, HTML, and CSS.
+
+Full replaces Prism with lazily imported highlight.js and adds:
+
+- Complete official modular Mermaid ESM distribution, loaded only for Mermaid fences
+- Strict Mermaid SVG sanitization and lazy svg-pan-zoom controls
+- Safe, bounded YAML frontmatter cards loaded only for frontmatter documents
+- Broad highlight.js language coverage loaded only when code blocks exist
+
+## Install and build
+
+Download the **Full** or **Lite** DMG from
+[Releases](https://github.com/trsdn/mdviewer/releases), or build both editions:
 
 ```bash
 brew install xcodegen
 xcodegen generate
-xcodebuild -scheme MDViewer -configuration Release build
+xcodebuild -scheme MDViewer-Lite -configuration Release build
+xcodebuild -scheme MDViewer-Full -configuration Release build
 ```
 
-## Need editing too?
+Release engineering:
 
-[MDViewer+](https://github.com/trsdn/mdviewerplus) adds a native Markdown editor, live split preview, scroll sync, syntax highlighting, formatting shortcuts, and printing while keeping the same lightweight macOS approach. See the [MDViewer+ website](https://trsdn.github.io/mdviewerplus/).
+```bash
+./scripts/vendor_web_assets.sh --check
+ALLOW_UNSIGNED=1 ./scripts/build_release.sh  # local/CI verification
+./scripts/release_macos.sh                   # signed + notarized Lite and Full DMGs
+```
 
-## Keyboard Shortcuts
+The release script produces clearly named DMGs and SHA-256 files, notarizes and
+staples both, and runs Gatekeeper checks. It does not publish a GitHub release.
 
-Choose preferred palettes in **MDViewer > Settings**. System mode follows the current macOS appearance and switches between those preferences. Sepia is a light palette selected in Settings; the existing mode shortcuts remain unchanged.
-
-Choose **View > Refresh Sibling Navigation…** to discover files added to the folder. If macOS restricts folder enumeration, the same command requests read-only folder access. Opening a document never prompts solely for navigation, and Reload also refreshes sibling availability.
+## Keyboard shortcuts
 
 | Action | Shortcut |
-|--------|----------|
+| --- | --- |
+| Find / next / previous | `Cmd F` / `Cmd G` / `Cmd Shift G` |
+| Quick Open current folder | `Cmd K` |
+| Document outline | `Cmd Shift O` |
 | Reload | `Cmd R` |
-| Previous Markdown File | `Cmd Option Left Arrow` |
-| Next Markdown File | `Cmd Option Right Arrow` |
-| Zoom In | `Cmd +` |
-| Zoom Out | `Cmd -` |
-| Actual Size | `Cmd 0` |
-| System Appearance | `Cmd Shift 0` |
-| Light Mode | `Cmd Shift 1` |
-| Dark Mode | `Cmd Shift 2` |
+| Previous / next Markdown file | `Cmd Option Left` / `Cmd Option Right` |
+| Zoom in / out / actual size | `Cmd +` / `Cmd -` / `Cmd 0` |
+| System / light / dark appearance | `Cmd Shift 0` / `Cmd Shift 1` / `Cmd Shift 2` |
 
-## Reading Themes
+## Security
 
-| Light themes | Dark themes |
-|--------------|-------------|
-| GitHub Light | GitHub Dark |
-| Solarized Light | Solarized Dark |
-| Sepia | Dracula |
-|  | Monokai |
-|  | Nord |
+MDViewer is an App Sandbox application with read-only user-selected file access
+and app-scoped security bookmarks. It has no network entitlement.
 
-Themes use built-in trusted palettes and apply without reloading the document or changing its scroll position or zoom.
+- CSP blocks networking, workers, frames, objects, forms, media, and remote code.
+- Markdown HTML is sanitized before any enhancement runs.
+- External navigation is limited to `http`, `https`, and `mailto`.
+- Internal links are resolved natively and reject traversal and symlink escapes.
+- Local images reject traversal, SVG, mismatched types, oversized files, and
+  anything outside the authorized folder.
+- Full modules are served only from a generated bundle allowlist.
+- Mermaid uses strict mode, disables HTML labels, and sanitizes generated SVG
+  with a separate SVG policy.
+- YAML rejects custom tags, aliases, prototype keys, deep/large structures, and
+  executable schemas.
+- Lite physically contains no Full modules; Full contains no Prism engine.
 
 ## Dependencies
 
-| Library | Version | License | Purpose |
-|---------|---------|---------|---------|
-| [marked](https://github.com/markedjs/marked) | 18.0.9 | MIT | Markdown → HTML parsing |
-| [DOMPurify](https://github.com/cure53/DOMPurify) | 3.4.12 | Apache-2.0 OR MPL-2.0 | HTML sanitization |
+| Library | Version | License | Edition | Purpose |
+| --- | --- | --- | --- | --- |
+| marked | 18.0.9 | MIT | Both | Markdown parser |
+| DOMPurify | 3.4.12 | Apache-2.0 OR MPL-2.0 | Both | HTML/SVG sanitization |
+| marked-footnote | 1.4.0 | MIT | Both | Footnotes |
+| Prism core | 1.30.0 | MIT | Lite | Compact selected-language highlighting |
+| highlight.js | 11.11.1 | BSD-3-Clause | Full | Broad lazy highlighting |
+| js-yaml | 4.1.0 | MIT | Full | Restricted frontmatter parsing |
+| Mermaid | 11.12.0 | MIT | Full | Complete offline diagrams |
+| svg-pan-zoom | 3.6.2 | BSD-2-Clause | Full | Diagram pan and zoom |
 
-No Swift package dependencies or third-party native frameworks. Official browser distributions and their license notices are bundled with the app; no package manager is used at runtime.
+Exact asset checksums, provenance, bytes, and edition membership are recorded in
+[`third-party/manifest.json`](third-party/manifest.json) and
+[`docs/THIRD-PARTY-NOTICES.md`](docs/THIRD-PARTY-NOTICES.md).
 
-## Security and local images
+## Need editing too?
 
-MDViewer is a read-only App Sandbox application. Markdown HTML is sanitized, renderer networking is blocked by Content Security Policy, remote images are not loaded, and only `http`, `https`, and `mailto` links open externally. Same-page fragment links remain in the preview; relative file links are intentionally not opened.
-
-When a document contains a supported relative raster image, MDViewer asks for read-only access to the document’s folder. The app stores an app-scoped security bookmark so access can be restored. Its custom WebKit resource loader rejects traversal, symlink escapes, SVG, unsupported or mismatched file types, and anything outside the authorized folder.
+[MDViewer+](https://github.com/trsdn/mdviewerplus) adds a native editor and
+split preview while retaining the lightweight macOS approach.
 
 ## License
 

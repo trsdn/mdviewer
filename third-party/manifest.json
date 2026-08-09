@@ -1,0 +1,1263 @@
+{
+  "schema": 1,
+  "generatedBy": "scripts/vendor_web_assets.mjs",
+  "product": "MDViewer",
+  "productVersion": "2.0.0",
+  "editions": {
+    "lite": [
+      "common",
+      "lite"
+    ],
+    "full": [
+      "common",
+      "full"
+    ]
+  },
+  "packages": [
+    {
+      "name": "marked",
+      "version": "18.0.9",
+      "license": "MIT",
+      "source": "https://github.com/markedjs/marked/releases/tag/v18.0.9",
+      "homepage": "https://github.com/markedjs/marked",
+      "edition": "common",
+      "note": "Retained browser distribution shipped since MDViewer 1.0. The exact build is committed to this repository and pinned by SHA-256 rather than refetched, so vendoring never silently changes the parser.",
+      "totalBytes": 46763,
+      "assets": [
+        {
+          "path": "MDViewer/Resources/MARKED-LICENSE.txt",
+          "bytes": 2942,
+          "sha256": "8e3a3f82f59a60958f56ca08f445647c32a4733dc7ca6c2c46f6eb898471ab9c",
+          "retained": true
+        },
+        {
+          "path": "MDViewer/Resources/marked.umd.js",
+          "bytes": 43821,
+          "sha256": "ba65f1c8948e6b01321399800843e9048b31e1c197652d4b0fafae840b30e32b",
+          "retained": true
+        }
+      ]
+    },
+    {
+      "name": "dompurify",
+      "version": "3.4.12",
+      "license": "Apache-2.0 OR MPL-2.0",
+      "source": "https://registry.npmjs.org/dompurify/-/dompurify-3.4.12.tgz",
+      "homepage": "https://github.com/cure53/DOMPurify",
+      "edition": "common",
+      "totalBytes": 57293,
+      "assets": [
+        {
+          "path": "MDViewer/Resources/DOMPURIFY-APACHE-LICENSE.txt",
+          "bytes": 11358,
+          "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30"
+        },
+        {
+          "path": "MDViewer/Resources/DOMPURIFY-MPL-LICENSE.txt",
+          "bytes": 16726,
+          "sha256": "fab3dd6bdab226f1c08630b1dd917e11fcb4ec5e1e020e2c16f83a0a13863e85"
+        },
+        {
+          "path": "MDViewer/Resources/dompurify.min.js",
+          "bytes": 29209,
+          "sha256": "c45ba939765574f96cbf35ee9b6d89f73756a17921814425e74b82f7c54603ce"
+        }
+      ]
+    },
+    {
+      "name": "marked-footnote",
+      "version": "1.4.0",
+      "license": "MIT",
+      "source": "https://registry.npmjs.org/marked-footnote/-/marked-footnote-1.4.0.tgz",
+      "homepage": "https://github.com/bent10/marked-extensions/tree/main/packages/footnote",
+      "edition": "common",
+      "totalBytes": 4091,
+      "assets": [
+        {
+          "path": "MDViewer/Resources/MARKED-FOOTNOTE-LICENSE.txt",
+          "bytes": 1109,
+          "sha256": "9359f7399b808813111a91c5d28656d5843d8f6d337168541938286dbf273a32"
+        },
+        {
+          "path": "MDViewer/Resources/marked-footnote.umd.js",
+          "bytes": 2982,
+          "sha256": "3ff8fd955edbe6a76eaae32ec8628caf29dbb103cfe6743654090153b833dcec"
+        }
+      ]
+    },
+    {
+      "name": "prismjs",
+      "version": "1.30.0",
+      "license": "MIT",
+      "source": "https://registry.npmjs.org/prismjs/-/prismjs-1.30.0.tgz",
+      "homepage": "https://github.com/PrismJS/prism",
+      "edition": "lite",
+      "note": "Custom build: Prism core plus compact MDViewer grammars for HTML, CSS, JavaScript, TypeScript, JSON, Bash, Python, Rust, Swift (under 10 KB minified).",
+      "totalBytes": 11126,
+      "assets": [
+        {
+          "path": "MDViewer/LiteResources/PRISM-LICENSE.txt",
+          "bytes": 1066,
+          "sha256": "2b947f0901a7ffcf08a89957da9783c0e9c6e72cb6ce8e959f501ab5409e4d2b"
+        },
+        {
+          "path": "MDViewer/LiteResources/prism.min.js",
+          "bytes": 10060,
+          "sha256": "6bfa17723fe5c4e250fac74171ca12c7f4f15de16536a99eb89d39006fddd293",
+          "generated": true
+        }
+      ]
+    },
+    {
+      "name": "@highlightjs/cdn-assets",
+      "version": "11.11.1",
+      "license": "BSD-3-Clause",
+      "source": "https://registry.npmjs.org/@highlightjs/cdn-assets/-/cdn-assets-11.11.1.tgz",
+      "homepage": "https://github.com/highlightjs/highlight.js",
+      "edition": "full",
+      "note": "ESM common build, lazily imported only when code fences exist.",
+      "totalBytes": 128908,
+      "assets": [
+        {
+          "path": "MDViewer/FullResources/HIGHLIGHTJS-LICENSE.txt",
+          "bytes": 1514,
+          "sha256": "6c081431591d9df696c82dc598fe1423765b8a299b200ed00b281afd0f64c490"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/highlight/highlight.min.mjs",
+          "bytes": 127394,
+          "sha256": "7865839949f0764d9e0a21e311a4e2c42633eeaee8ca5ec127b86438565731fe"
+        }
+      ]
+    },
+    {
+      "name": "js-yaml",
+      "version": "4.1.0",
+      "license": "MIT",
+      "source": "https://registry.npmjs.org/js-yaml/-/js-yaml-4.1.0.tgz",
+      "homepage": "https://github.com/nodeca/js-yaml",
+      "edition": "full",
+      "note": "ESM build, lazily imported only for a valid frontmatter delimiter.",
+      "totalBytes": 108617,
+      "assets": [
+        {
+          "path": "MDViewer/FullResources/JS-YAML-LICENSE.txt",
+          "bytes": 1084,
+          "sha256": "a07bc24468b9654ce76a547d47a2db282d07733b715db4c73a98bd63961f9550"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/js-yaml/js-yaml.mjs",
+          "bytes": 107533,
+          "sha256": "16f210b939b359b6ec8dde581eb62c157185711dc7b719b33779c43db5c31a91"
+        }
+      ]
+    },
+    {
+      "name": "mermaid",
+      "version": "11.12.0",
+      "license": "MIT",
+      "source": "https://registry.npmjs.org/mermaid/-/mermaid-11.12.0.tgz",
+      "homepage": "https://github.com/mermaid-js/mermaid",
+      "edition": "full",
+      "note": "Official modular ESM distribution (minified entry plus every diagram chunk) so all supported diagram types render offline. The generated transitive notice file covers the complete installed dependency closure.",
+      "components": [
+        {
+          "name": "@antfu/install-pkg",
+          "version": "1.1.0",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40antfu%2Finstall-pkg/-/install-pkg-1.1.0.tgz"
+        },
+        {
+          "name": "@braintree/sanitize-url",
+          "version": "7.1.2",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40braintree%2Fsanitize-url/-/sanitize-url-7.1.2.tgz"
+        },
+        {
+          "name": "@chevrotain/cst-dts-gen",
+          "version": "11.0.3",
+          "license": "Apache-2.0",
+          "source": "https://registry.npmjs.org/%40chevrotain%2Fcst-dts-gen/-/cst-dts-gen-11.0.3.tgz"
+        },
+        {
+          "name": "@chevrotain/gast",
+          "version": "11.0.3",
+          "license": "Apache-2.0",
+          "source": "https://registry.npmjs.org/%40chevrotain%2Fgast/-/gast-11.0.3.tgz"
+        },
+        {
+          "name": "@chevrotain/regexp-to-ast",
+          "version": "11.0.3",
+          "license": "Apache-2.0",
+          "source": "https://registry.npmjs.org/%40chevrotain%2Fregexp-to-ast/-/regexp-to-ast-11.0.3.tgz"
+        },
+        {
+          "name": "@chevrotain/types",
+          "version": "11.0.3",
+          "license": "Apache-2.0",
+          "source": "https://registry.npmjs.org/%40chevrotain%2Ftypes/-/types-11.0.3.tgz"
+        },
+        {
+          "name": "@chevrotain/utils",
+          "version": "11.0.3",
+          "license": "Apache-2.0",
+          "source": "https://registry.npmjs.org/%40chevrotain%2Futils/-/utils-11.0.3.tgz"
+        },
+        {
+          "name": "@iconify/types",
+          "version": "2.0.0",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40iconify%2Ftypes/-/types-2.0.0.tgz"
+        },
+        {
+          "name": "@iconify/utils",
+          "version": "3.1.4",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40iconify%2Futils/-/utils-3.1.4.tgz"
+        },
+        {
+          "name": "@mermaid-js/parser",
+          "version": "0.6.3",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40mermaid-js%2Fparser/-/parser-0.6.3.tgz"
+        },
+        {
+          "name": "@types/d3",
+          "version": "7.4.3",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3/-/d3-7.4.3.tgz"
+        },
+        {
+          "name": "@types/d3-array",
+          "version": "3.2.2",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-array/-/d3-array-3.2.2.tgz"
+        },
+        {
+          "name": "@types/d3-axis",
+          "version": "3.0.6",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-axis/-/d3-axis-3.0.6.tgz"
+        },
+        {
+          "name": "@types/d3-brush",
+          "version": "3.0.6",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-brush/-/d3-brush-3.0.6.tgz"
+        },
+        {
+          "name": "@types/d3-chord",
+          "version": "3.0.6",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-chord/-/d3-chord-3.0.6.tgz"
+        },
+        {
+          "name": "@types/d3-color",
+          "version": "3.1.3",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-color/-/d3-color-3.1.3.tgz"
+        },
+        {
+          "name": "@types/d3-contour",
+          "version": "3.0.6",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-contour/-/d3-contour-3.0.6.tgz"
+        },
+        {
+          "name": "@types/d3-delaunay",
+          "version": "6.0.4",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-delaunay/-/d3-delaunay-6.0.4.tgz"
+        },
+        {
+          "name": "@types/d3-dispatch",
+          "version": "3.0.7",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-dispatch/-/d3-dispatch-3.0.7.tgz"
+        },
+        {
+          "name": "@types/d3-drag",
+          "version": "3.0.7",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-drag/-/d3-drag-3.0.7.tgz"
+        },
+        {
+          "name": "@types/d3-dsv",
+          "version": "3.0.7",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-dsv/-/d3-dsv-3.0.7.tgz"
+        },
+        {
+          "name": "@types/d3-ease",
+          "version": "3.0.2",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-ease/-/d3-ease-3.0.2.tgz"
+        },
+        {
+          "name": "@types/d3-fetch",
+          "version": "3.0.7",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-fetch/-/d3-fetch-3.0.7.tgz"
+        },
+        {
+          "name": "@types/d3-force",
+          "version": "3.0.10",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-force/-/d3-force-3.0.10.tgz"
+        },
+        {
+          "name": "@types/d3-format",
+          "version": "3.0.4",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-format/-/d3-format-3.0.4.tgz"
+        },
+        {
+          "name": "@types/d3-geo",
+          "version": "3.1.1",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-geo/-/d3-geo-3.1.1.tgz"
+        },
+        {
+          "name": "@types/d3-hierarchy",
+          "version": "3.1.7",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-hierarchy/-/d3-hierarchy-3.1.7.tgz"
+        },
+        {
+          "name": "@types/d3-interpolate",
+          "version": "3.0.4",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-interpolate/-/d3-interpolate-3.0.4.tgz"
+        },
+        {
+          "name": "@types/d3-path",
+          "version": "3.1.1",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-path/-/d3-path-3.1.1.tgz"
+        },
+        {
+          "name": "@types/d3-polygon",
+          "version": "3.0.2",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-polygon/-/d3-polygon-3.0.2.tgz"
+        },
+        {
+          "name": "@types/d3-quadtree",
+          "version": "3.0.6",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-quadtree/-/d3-quadtree-3.0.6.tgz"
+        },
+        {
+          "name": "@types/d3-random",
+          "version": "3.0.4",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-random/-/d3-random-3.0.4.tgz"
+        },
+        {
+          "name": "@types/d3-scale",
+          "version": "4.0.9",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-scale/-/d3-scale-4.0.9.tgz"
+        },
+        {
+          "name": "@types/d3-scale-chromatic",
+          "version": "3.1.0",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-scale-chromatic/-/d3-scale-chromatic-3.1.0.tgz"
+        },
+        {
+          "name": "@types/d3-selection",
+          "version": "3.0.11",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-selection/-/d3-selection-3.0.11.tgz"
+        },
+        {
+          "name": "@types/d3-shape",
+          "version": "3.1.8",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-shape/-/d3-shape-3.1.8.tgz"
+        },
+        {
+          "name": "@types/d3-time",
+          "version": "3.0.4",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-time/-/d3-time-3.0.4.tgz"
+        },
+        {
+          "name": "@types/d3-time-format",
+          "version": "4.0.3",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-time-format/-/d3-time-format-4.0.3.tgz"
+        },
+        {
+          "name": "@types/d3-timer",
+          "version": "3.0.2",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-timer/-/d3-timer-3.0.2.tgz"
+        },
+        {
+          "name": "@types/d3-transition",
+          "version": "3.0.9",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-transition/-/d3-transition-3.0.9.tgz"
+        },
+        {
+          "name": "@types/d3-zoom",
+          "version": "3.0.8",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fd3-zoom/-/d3-zoom-3.0.8.tgz"
+        },
+        {
+          "name": "@types/geojson",
+          "version": "7946.0.16",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Fgeojson/-/geojson-7946.0.16.tgz"
+        },
+        {
+          "name": "@types/trusted-types",
+          "version": "2.0.7",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/%40types%2Ftrusted-types/-/trusted-types-2.0.7.tgz"
+        },
+        {
+          "name": "chevrotain",
+          "version": "11.0.3",
+          "license": "Apache-2.0",
+          "source": "https://registry.npmjs.org/chevrotain/-/chevrotain-11.0.3.tgz"
+        },
+        {
+          "name": "chevrotain-allstar",
+          "version": "0.3.1",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/chevrotain-allstar/-/chevrotain-allstar-0.3.1.tgz"
+        },
+        {
+          "name": "commander",
+          "version": "7.2.0",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/commander/-/commander-7.2.0.tgz"
+        },
+        {
+          "name": "cose-base",
+          "version": "1.0.3",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/cose-base/-/cose-base-1.0.3.tgz"
+        },
+        {
+          "name": "cytoscape",
+          "version": "3.34.0",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/cytoscape/-/cytoscape-3.34.0.tgz"
+        },
+        {
+          "name": "cytoscape-cose-bilkent",
+          "version": "4.1.0",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/cytoscape-cose-bilkent/-/cytoscape-cose-bilkent-4.1.0.tgz"
+        },
+        {
+          "name": "cytoscape-fcose",
+          "version": "2.2.0",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/cytoscape-fcose/-/cytoscape-fcose-2.2.0.tgz"
+        },
+        {
+          "name": "d3",
+          "version": "7.9.0",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3/-/d3-7.9.0.tgz"
+        },
+        {
+          "name": "d3-array",
+          "version": "3.2.4",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-array/-/d3-array-3.2.4.tgz"
+        },
+        {
+          "name": "d3-axis",
+          "version": "3.0.0",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-axis/-/d3-axis-3.0.0.tgz"
+        },
+        {
+          "name": "d3-brush",
+          "version": "3.0.0",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-brush/-/d3-brush-3.0.0.tgz"
+        },
+        {
+          "name": "d3-chord",
+          "version": "3.0.1",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-chord/-/d3-chord-3.0.1.tgz"
+        },
+        {
+          "name": "d3-color",
+          "version": "3.1.0",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-color/-/d3-color-3.1.0.tgz"
+        },
+        {
+          "name": "d3-contour",
+          "version": "4.0.2",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-contour/-/d3-contour-4.0.2.tgz"
+        },
+        {
+          "name": "d3-delaunay",
+          "version": "6.0.4",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-delaunay/-/d3-delaunay-6.0.4.tgz"
+        },
+        {
+          "name": "d3-dispatch",
+          "version": "3.0.1",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-dispatch/-/d3-dispatch-3.0.1.tgz"
+        },
+        {
+          "name": "d3-drag",
+          "version": "3.0.0",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-drag/-/d3-drag-3.0.0.tgz"
+        },
+        {
+          "name": "d3-dsv",
+          "version": "3.0.1",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-dsv/-/d3-dsv-3.0.1.tgz"
+        },
+        {
+          "name": "d3-ease",
+          "version": "3.0.1",
+          "license": "BSD-3-Clause",
+          "source": "https://registry.npmjs.org/d3-ease/-/d3-ease-3.0.1.tgz"
+        },
+        {
+          "name": "d3-fetch",
+          "version": "3.0.1",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-fetch/-/d3-fetch-3.0.1.tgz"
+        },
+        {
+          "name": "d3-force",
+          "version": "3.0.0",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-force/-/d3-force-3.0.0.tgz"
+        },
+        {
+          "name": "d3-format",
+          "version": "3.1.2",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-format/-/d3-format-3.1.2.tgz"
+        },
+        {
+          "name": "d3-geo",
+          "version": "3.1.1",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-geo/-/d3-geo-3.1.1.tgz"
+        },
+        {
+          "name": "d3-hierarchy",
+          "version": "3.1.2",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-hierarchy/-/d3-hierarchy-3.1.2.tgz"
+        },
+        {
+          "name": "d3-interpolate",
+          "version": "3.0.1",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-interpolate/-/d3-interpolate-3.0.1.tgz"
+        },
+        {
+          "name": "d3-path",
+          "version": "3.1.0",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-path/-/d3-path-3.1.0.tgz"
+        },
+        {
+          "name": "d3-polygon",
+          "version": "3.0.1",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-polygon/-/d3-polygon-3.0.1.tgz"
+        },
+        {
+          "name": "d3-quadtree",
+          "version": "3.0.1",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-quadtree/-/d3-quadtree-3.0.1.tgz"
+        },
+        {
+          "name": "d3-random",
+          "version": "3.0.1",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-random/-/d3-random-3.0.1.tgz"
+        },
+        {
+          "name": "d3-sankey",
+          "version": "0.12.3",
+          "license": "BSD-3-Clause",
+          "source": "https://registry.npmjs.org/d3-sankey/-/d3-sankey-0.12.3.tgz"
+        },
+        {
+          "name": "d3-scale",
+          "version": "4.0.2",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-scale/-/d3-scale-4.0.2.tgz"
+        },
+        {
+          "name": "d3-scale-chromatic",
+          "version": "3.1.0",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-scale-chromatic/-/d3-scale-chromatic-3.1.0.tgz"
+        },
+        {
+          "name": "d3-selection",
+          "version": "3.0.0",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-selection/-/d3-selection-3.0.0.tgz"
+        },
+        {
+          "name": "d3-shape",
+          "version": "3.2.0",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-shape/-/d3-shape-3.2.0.tgz"
+        },
+        {
+          "name": "d3-time",
+          "version": "3.1.0",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-time/-/d3-time-3.1.0.tgz"
+        },
+        {
+          "name": "d3-time-format",
+          "version": "4.1.0",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-time-format/-/d3-time-format-4.1.0.tgz"
+        },
+        {
+          "name": "d3-timer",
+          "version": "3.0.1",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-timer/-/d3-timer-3.0.1.tgz"
+        },
+        {
+          "name": "d3-transition",
+          "version": "3.0.1",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-transition/-/d3-transition-3.0.1.tgz"
+        },
+        {
+          "name": "d3-zoom",
+          "version": "3.0.0",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/d3-zoom/-/d3-zoom-3.0.0.tgz"
+        },
+        {
+          "name": "dagre-d3-es",
+          "version": "7.0.11",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/dagre-d3-es/-/dagre-d3-es-7.0.11.tgz"
+        },
+        {
+          "name": "dayjs",
+          "version": "1.11.21",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/dayjs/-/dayjs-1.11.21.tgz"
+        },
+        {
+          "name": "delaunator",
+          "version": "5.1.0",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/delaunator/-/delaunator-5.1.0.tgz"
+        },
+        {
+          "name": "dompurify",
+          "version": "3.4.12",
+          "license": "(MPL-2.0 OR Apache-2.0)",
+          "source": "https://registry.npmjs.org/dompurify/-/dompurify-3.4.12.tgz"
+        },
+        {
+          "name": "hachure-fill",
+          "version": "0.5.2",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/hachure-fill/-/hachure-fill-0.5.2.tgz"
+        },
+        {
+          "name": "iconv-lite",
+          "version": "0.6.3",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/iconv-lite/-/iconv-lite-0.6.3.tgz"
+        },
+        {
+          "name": "import-meta-resolve",
+          "version": "4.2.0",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/import-meta-resolve/-/import-meta-resolve-4.2.0.tgz"
+        },
+        {
+          "name": "internmap",
+          "version": "2.0.3",
+          "license": "ISC",
+          "source": "https://registry.npmjs.org/internmap/-/internmap-2.0.3.tgz"
+        },
+        {
+          "name": "katex",
+          "version": "0.16.47",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/katex/-/katex-0.16.47.tgz"
+        },
+        {
+          "name": "khroma",
+          "version": "2.1.0",
+          "license": "See bundled license text",
+          "source": "https://registry.npmjs.org/khroma/-/khroma-2.1.0.tgz"
+        },
+        {
+          "name": "langium",
+          "version": "3.3.1",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/langium/-/langium-3.3.1.tgz"
+        },
+        {
+          "name": "layout-base",
+          "version": "1.0.2",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/layout-base/-/layout-base-1.0.2.tgz"
+        },
+        {
+          "name": "lodash-es",
+          "version": "4.18.1",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/lodash-es/-/lodash-es-4.18.1.tgz"
+        },
+        {
+          "name": "marked",
+          "version": "16.4.2",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/marked/-/marked-16.4.2.tgz"
+        },
+        {
+          "name": "mermaid",
+          "version": "11.12.0",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/mermaid/-/mermaid-11.12.0.tgz"
+        },
+        {
+          "name": "package-manager-detector",
+          "version": "1.8.0",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/package-manager-detector/-/package-manager-detector-1.8.0.tgz"
+        },
+        {
+          "name": "path-data-parser",
+          "version": "0.1.0",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/path-data-parser/-/path-data-parser-0.1.0.tgz"
+        },
+        {
+          "name": "points-on-curve",
+          "version": "0.2.0",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/points-on-curve/-/points-on-curve-0.2.0.tgz"
+        },
+        {
+          "name": "points-on-path",
+          "version": "0.2.1",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/points-on-path/-/points-on-path-0.2.1.tgz"
+        },
+        {
+          "name": "robust-predicates",
+          "version": "3.0.3",
+          "license": "Unlicense",
+          "source": "https://registry.npmjs.org/robust-predicates/-/robust-predicates-3.0.3.tgz"
+        },
+        {
+          "name": "roughjs",
+          "version": "4.6.6",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/roughjs/-/roughjs-4.6.6.tgz"
+        },
+        {
+          "name": "rw",
+          "version": "1.3.3",
+          "license": "BSD-3-Clause",
+          "source": "https://registry.npmjs.org/rw/-/rw-1.3.3.tgz"
+        },
+        {
+          "name": "safer-buffer",
+          "version": "2.1.2",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/safer-buffer/-/safer-buffer-2.1.2.tgz"
+        },
+        {
+          "name": "stylis",
+          "version": "4.4.0",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/stylis/-/stylis-4.4.0.tgz"
+        },
+        {
+          "name": "tinyexec",
+          "version": "1.2.4",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/tinyexec/-/tinyexec-1.2.4.tgz"
+        },
+        {
+          "name": "ts-dedent",
+          "version": "2.3.0",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/ts-dedent/-/ts-dedent-2.3.0.tgz"
+        },
+        {
+          "name": "uuid",
+          "version": "11.1.1",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/uuid/-/uuid-11.1.1.tgz"
+        },
+        {
+          "name": "vscode-jsonrpc",
+          "version": "8.2.0",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/vscode-jsonrpc/-/vscode-jsonrpc-8.2.0.tgz"
+        },
+        {
+          "name": "vscode-languageserver",
+          "version": "9.0.1",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/vscode-languageserver/-/vscode-languageserver-9.0.1.tgz"
+        },
+        {
+          "name": "vscode-languageserver-protocol",
+          "version": "3.17.5",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/vscode-languageserver-protocol/-/vscode-languageserver-protocol-3.17.5.tgz"
+        },
+        {
+          "name": "vscode-languageserver-textdocument",
+          "version": "1.0.12",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/vscode-languageserver-textdocument/-/vscode-languageserver-textdocument-1.0.12.tgz"
+        },
+        {
+          "name": "vscode-languageserver-types",
+          "version": "3.17.5",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/vscode-languageserver-types/-/vscode-languageserver-types-3.17.5.tgz"
+        },
+        {
+          "name": "vscode-uri",
+          "version": "3.0.8",
+          "license": "MIT",
+          "source": "https://registry.npmjs.org/vscode-uri/-/vscode-uri-3.0.8.tgz"
+        }
+      ],
+      "totalBytes": 2939884,
+      "assets": [
+        {
+          "path": "MDViewer/FullResources/MERMAID-LICENSE.txt",
+          "bytes": 1089,
+          "sha256": "ec9fb67dcb25eccc416ed56e1aab819222c805a2a4bfe4cb19e7556bf2ffde80"
+        },
+        {
+          "path": "MDViewer/FullResources/MERMAID-TRANSITIVE-NOTICES.txt",
+          "bytes": 237040,
+          "sha256": "cb730f3fafccab78f8a92fae9f66ff51d2615f6ee4fd5b93b44d492b9f2cc81f",
+          "generated": true
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/architecture-U656AL7Q-3ZQKGQJL.mjs",
+          "bytes": 258,
+          "sha256": "956d2176d907e2f62c2b4ea794ff76f4be620b97f56ab21cb1b903b39b6d614b"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/architectureDiagram-4X3Z3J56.mjs",
+          "bytes": 152093,
+          "sha256": "9e48ed3e4a5171b75d99272d0fc35d2ff44b5c3988e9d87bab2f69ab606d9631"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/blockDiagram-BWRZOBD3.mjs",
+          "bytes": 72109,
+          "sha256": "0053371e1dc19363f75f2ed230edae037f21897072141988e8602f259a669f01"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/c4Diagram-Q5SP5FFD.mjs",
+          "bytes": 70531,
+          "sha256": "adc54371d4ddf79f2780a73a25dc0387c17f064946150c23d0e085763987e0dc"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-2XYWPRAO.mjs",
+          "bytes": 355265,
+          "sha256": "e41d24fa23710730f3fdbfa3431ce47654563d7e519f8d954d3f503697c07ccc"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-353K7GK5.mjs",
+          "bytes": 1662,
+          "sha256": "230d2578f793cc82eb502db397f22955bbb7b1b1f6c30de6a3697fdd77045da0"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-4HFYJGYH.mjs",
+          "bytes": 3889,
+          "sha256": "958a2169716ece8b4bfa97983d17752bc74fcf69e42b1774c6f1f543447aeebd"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-4KE642ED.mjs",
+          "bytes": 221,
+          "sha256": "7f389007a9669c112b8f1d6ba3cb67baec2ecb66c3589ef71a713668b230cb13"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-5V7UUW6L.mjs",
+          "bytes": 1846,
+          "sha256": "d0482e30f20b3f8c7e0c0a53926d77a1203385a8c8310c95a4edc70c2b8f97ac"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-63GW7ZVL.mjs",
+          "bytes": 120481,
+          "sha256": "0332fbf683938f88199ab9dfe64e8d855a309bf539e4dd626d5274cea3a3b8a6"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-6DHVG6KC.mjs",
+          "bytes": 737,
+          "sha256": "4e1c30322552a6168f0fbe87280b1e3a6a282ddf060744a1ab3fd6a151b62b18"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-6EQESGSB.mjs",
+          "bytes": 263,
+          "sha256": "599534087b2727b42c86d5fab5d62159e5aaaf816ba21948c982cb83d6a357fc"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-6XQQT3RD.mjs",
+          "bytes": 1794,
+          "sha256": "a40ff3f3d2dd6b53351418403043b72985016f88f2b37454eb1670b42c1fe072"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-7SRKK4IT.mjs",
+          "bytes": 468762,
+          "sha256": "205fd7d73dafabd3afb13f774c4b87e8cf30e0bf5162a4a1701ba07ae7ba2fb7"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-A4ITRWGT.mjs",
+          "bytes": 14244,
+          "sha256": "48aaffdb803ba00dfad459d9da2a372d5bd4fcd3630d605aea457f7419373754"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-AI4T2ZLM.mjs",
+          "bytes": 36663,
+          "sha256": "48731bcd9fc2b630f33a2a9fbb303dacae4e87b38e0b79dae51f446d50662c8b"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-ASAHGCDZ.mjs",
+          "bytes": 316,
+          "sha256": "ee61bfa0548d8adf2aabfdf4f92e93e6175937b5cc601d95c5c471c5ab6becb0"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-CCU7O4O5.mjs",
+          "bytes": 28456,
+          "sha256": "85914213427d4800267f33d6d5855aa0c022207d2513901973ec485422a7b3f4"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-DY3L2I7V.mjs",
+          "bytes": 563,
+          "sha256": "a54b09f3c51f92ac77f4587dffb317df436c268332ea43ad10bbb54cbf8bc358"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-EFRVIJHI.mjs",
+          "bytes": 9129,
+          "sha256": "fb49ad12f054e7934f1e6d0ae135b619350827164b15ab8e858f7561a503333e"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-EOITJJC2.mjs",
+          "bytes": 914,
+          "sha256": "03320de61dbed2a878287eab45b4627320ee6e3a69fc1072ffbbdc5522b3efc2"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-EQI6KKA3.mjs",
+          "bytes": 121842,
+          "sha256": "30dfbbb90da7f1cd2dd76650fa8f3e657d11df10b3ff8c77ec8e45532bd84f5b"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-EYG76IYJ.mjs",
+          "bytes": 6101,
+          "sha256": "062a99e7e79406d8981d6a5e7108329b363a44986cb002a7be4a835f3b912b9f"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-F3RBCZRS.mjs",
+          "bytes": 42442,
+          "sha256": "4ba28b3d8537f773fb363cd5eda8a1b9f1c6bdb686a20ed7e201ef2580e58069"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-GOL2OBWC.mjs",
+          "bytes": 52524,
+          "sha256": "979d06b5dcc616f7ce5bf9faa43c83eb3c3d659d79b8d2a8b6cb03f7195451a5"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-GTKDMUJJ.mjs",
+          "bytes": 716,
+          "sha256": "3a0a0d3d6036b6143c1641ecc8fad23d0e629b95845fbe9ad30da031e0a9d7b7"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-IQQE2MEC.mjs",
+          "bytes": 1317,
+          "sha256": "78aeaddd6682b46cd2e88b9ceed5df76500ca0ac52b8914fb53973bc620fd21f"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-JXEFGRG2.mjs",
+          "bytes": 557,
+          "sha256": "c39dc6da39796a82efdc663e87aa93e80c3a14227e97869709cd2ed257a29d1b"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-KXVH62NG.mjs",
+          "bytes": 126610,
+          "sha256": "96bbc4fe2f344daabb9e39b6c0bdb07d697da730bf35ed8b68b9b7756702f70e"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-LM6QDVU5.mjs",
+          "bytes": 278,
+          "sha256": "3b7a4a076bc91fa816956adfc1adfcf5c4161573ce7d60188d48a8245cf91943"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-OMTJKCYW.mjs",
+          "bytes": 25321,
+          "sha256": "4badfc95ec9f295e212488521e761a6e3688e87806d985d42eb07f866c2dc618"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-P7EU7REX.mjs",
+          "bytes": 45448,
+          "sha256": "13eb80469cf3f89db75f8ef74044568ca141dde4de99a862cd63a5a34f35bae1"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-RV6DXAHM.mjs",
+          "bytes": 1897,
+          "sha256": "d8df6a90c9be7c9e537bdc3a2495e13cb581d8bbddf38bc8a75034e0223d24b9"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-T244DUNM.mjs",
+          "bytes": 562,
+          "sha256": "8b033ba19379d07f1431946723c28491f9cec448cb7267c462fdbb3d3babe64d"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-THXVA4DE.mjs",
+          "bytes": 2041,
+          "sha256": "82a243ce1b7188955b5bd3556e5030288d5f65653a9f76fd8b34032d6d6aec01"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-TLYDTAVK.mjs",
+          "bytes": 570,
+          "sha256": "9acbacba7fcfc58fbf5fa6bc210d5fc6092f3ccdb090753f6a8054a0d4fe1e05"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-TVVDRG3C.mjs",
+          "bytes": 21659,
+          "sha256": "2be5591558026a751c310b118f6ae77ea8e30bd0ee1335db8623e765b23d163e"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-VSLJSFIP.mjs",
+          "bytes": 189,
+          "sha256": "f6c325b39e3945f0be8fe2450ac1430851753d7cb0d13dabb1e4ec284b9485f3"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-W6CKT3PL.mjs",
+          "bytes": 1250,
+          "sha256": "1f3eb6984f9cb525fc3063f997a7cc7bfba0eddd38475874497249396acfb7cd"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-WONJCSFZ.mjs",
+          "bytes": 1506,
+          "sha256": "de16fc6b7424433f4680e78bb7a7d14ad57514d8ec8ab131f668fd3299cd1f75"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-XW6ABFJP.mjs",
+          "bytes": 557,
+          "sha256": "580b80f8c221fbf8946e4a441556b6b2fdfb035d8f246a5058d465b40a4bc62a"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/chunk-ZZTKAOFA.mjs",
+          "bytes": 360,
+          "sha256": "b4d99347dd9d449e6cfa60005c7d468467bc57940918f6178746c11397f3891f"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/classDiagram-FKO7XAE5.mjs",
+          "bytes": 707,
+          "sha256": "6bbab6db1ac91079dbd1f19351d7e3633dfe1db9966f5d6ccbef60d223b56996"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/classDiagram-v2-XZHHGUJO.mjs",
+          "bytes": 707,
+          "sha256": "6bbab6db1ac91079dbd1f19351d7e3633dfe1db9966f5d6ccbef60d223b56996"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/cose-bilkent-AZ5BDB2T.mjs",
+          "bytes": 84169,
+          "sha256": "8eaf27296f90be8f1bcf5d8c5cdd3b6d9d1ea23e691fd3ade3653256d7b206c8"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/dagre-X5LCLMGV.mjs",
+          "bytes": 11227,
+          "sha256": "b2b6b37d0bb4d80d0ae0b50f9632d8e804a3a344479064187cdcf3965423acdf"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/diagram-BZV4OSZQ.mjs",
+          "bytes": 4631,
+          "sha256": "6fb500dbc6779d8615ad824d5ee4261d90c578be483bed501da815132ffa7492"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/diagram-DKYQLJNW.mjs",
+          "bytes": 6216,
+          "sha256": "4322b6db0c3d11ea11130754e30f037145ca5d83be287043d32e4d3aedc1da79"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/diagram-LL6QPXA2.mjs",
+          "bytes": 11301,
+          "sha256": "05a946850a993419da01c43b4dd0126d0bedb318bca01b9994d3c863e8399d5b"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/erDiagram-MBDK6S7D.mjs",
+          "bytes": 25595,
+          "sha256": "0d63c1b41ee71514d1e9d764e8eedc99deb46bf1c487c095c3a83ac7c62f173b"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/flowDiagram-UML6HZQP.mjs",
+          "bytes": 60995,
+          "sha256": "46133c00c31cd64e5b2987586e8fee68de2c42e39fb9148670fda96c12a395c4"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/ganttDiagram-SAESIEWH.mjs",
+          "bytes": 43443,
+          "sha256": "d2f7f0fc47805df2251bd936ff4b15a07330994791ad74a46871bf41fdf1b95a"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/gitGraph-F6HP7TQM-F73VLA63.mjs",
+          "bytes": 250,
+          "sha256": "b9c3a6dc47fdecfb981b33a9283c0b9b928afe04ce9913f948fcffc04d0b7d91"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/gitGraphDiagram-JCGM6PWI.mjs",
+          "bytes": 24229,
+          "sha256": "eadfcd7e835763d4eb8be3c71a932459af4895afacd756cc03bc3b4076c4a2b3"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/info-NVLQJR56-7B66GPTN.mjs",
+          "bytes": 242,
+          "sha256": "efc26412b6ddbb46945cb1bd625b78ee6695fd00491f9c1e2bb03fd07ffb72c9"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/infoDiagram-GKI3LBYJ.mjs",
+          "bytes": 1011,
+          "sha256": "df4862c3fecac40c7fea871d523a77b38ab426a061cd0badbc7a25c066326ee6"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/journeyDiagram-E42M6OD5.mjs",
+          "bytes": 23513,
+          "sha256": "aaf31d9e0408a0f247cc62220b48128760337acc7fc28a965fb1529b79595b24"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/kanban-definition-D5DEDDHO.mjs",
+          "bytes": 20630,
+          "sha256": "82d1dae652739e2665f48a7a5e937307139e6e041dc1e61662173d36c7e2ac05"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/katex-RV2QPRKB.mjs",
+          "bytes": 276594,
+          "sha256": "d336801a01bf67daaed469e72c9e12fc8573f379a9a13cd1b1f6e836cf05b485"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/mindmap-definition-ZYHNXUZP.mjs",
+          "bytes": 21584,
+          "sha256": "7b24595277596a6cded3307b855254439178a5f3e6ffc189719ecb2f27d5bb47"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/packet-BFZMPI3H-GN4PBP3H.mjs",
+          "bytes": 246,
+          "sha256": "79fcd0636c4f1861d9692e4b61cd3bcd23270e6cce593ca2494bcac4c0d95b53"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/pie-7BOR55EZ-EOOIGJLO.mjs",
+          "bytes": 240,
+          "sha256": "d8003f0044ec5cc281e5d455323a3def6f689fb0ed0925d60e79fbc20809dbac"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/pieDiagram-QB62DFGK.mjs",
+          "bytes": 4338,
+          "sha256": "d48ee2e2ab3438e2f81a00dbc63559cb94f14ebe59da2c7d1f81c01d087810ef"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/quadrantDiagram-AGVETKZM.mjs",
+          "bytes": 33866,
+          "sha256": "b7c363a470edd42d583a78ec3d871d3c75c7668e6d8eed9fd72b9e87df1d4e0d"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/radar-NHE76QYJ-6YWZBFZN.mjs",
+          "bytes": 244,
+          "sha256": "4e4f6618dba4d2db04c10cbcd671b4b846951b12098b90d78eff738411405868"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/requirementDiagram-BJFPASL3.mjs",
+          "bytes": 30475,
+          "sha256": "80044ece214cc1c332598ee9014abece2bd71c331e12820c6479134e1fae4100"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/sankeyDiagram-XSL23WO4.mjs",
+          "bytes": 23050,
+          "sha256": "16f955f062a5d42eca7ba89f9997535b69823e6110adfcd8f4dc3244f8716309"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/sequenceDiagram-W4XLKSBU.mjs",
+          "bytes": 97864,
+          "sha256": "27d3509ce6be8f107822efad0209d228813ea94e49f99b457c8f261c7964026e"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/stateDiagram-v2-GQU47BET.mjs",
+          "bytes": 686,
+          "sha256": "5fe20581b79fd10fc96b601bcfb5534caca07d0fe6b7dedb92aff2825f3c8938"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/stateDiagram-ZFDIVMDF.mjs",
+          "bytes": 10647,
+          "sha256": "c19b26c1a8ad5a6f0d3d03ba110bc0a989347328600b0fff8ff5dabef68f03e1"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/timeline-definition-DZOEFOHF.mjs",
+          "bytes": 23564,
+          "sha256": "835cb1b5ccadfaf114214083edd0358951681c4636d08e1cac0b8e63a49722cc"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/treemap-KMMF4GRG-7ORZ52ND.mjs",
+          "bytes": 248,
+          "sha256": "4d78473df73414d1645f9d27273f370222316e60dd4120add4507cb76f8ed309"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/chunks/mermaid.esm.min/xychartDiagram-6J6QOAP6.mjs",
+          "bytes": 39051,
+          "sha256": "db2462f9e19cc5ee0662afa5ac1e4aa408e1264e20c9307a51c5afe1a2fc19d2"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/mermaid/mermaid.esm.min.mjs",
+          "bytes": 26249,
+          "sha256": "765a1231ff0dc5fa788644cc9f17f869c181e7a28ad4e563d24325b0dad93d13"
+        }
+      ]
+    },
+    {
+      "name": "svg-pan-zoom",
+      "version": "3.6.2",
+      "license": "BSD-2-Clause",
+      "source": "https://registry.npmjs.org/svg-pan-zoom/-/svg-pan-zoom-3.6.2.tgz",
+      "homepage": "https://github.com/bumbu/svg-pan-zoom",
+      "edition": "full",
+      "note": "Lazily imported only after a diagram renders successfully.",
+      "totalBytes": 31106,
+      "assets": [
+        {
+          "path": "MDViewer/FullResources/SVG-PAN-ZOOM-LICENSE.txt",
+          "bytes": 1322,
+          "sha256": "a4fbaf0b818914459316cb22e1a9d01e0f8786fc10cfe355077cca048daa028a"
+        },
+        {
+          "path": "MDViewer/FullResources/WebModules/svg-pan-zoom/svg-pan-zoom.min.js",
+          "bytes": 29784,
+          "sha256": "9c8fc41b3359e699990766dd7a943595d234a80c880a90dfc14b920a273b99d8"
+        }
+      ]
+    }
+  ]
+}

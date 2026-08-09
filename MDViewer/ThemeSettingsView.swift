@@ -7,6 +7,14 @@ struct ThemeSettingsView: View {
 
     var body: some View {
         Form {
+            Section {
+                LabeledContent("Edition", value: AppVersion.edition.displayName)
+                LabeledContent("Version", value: AppVersion.marketingVersion)
+                LabeledContent("Build", value: AppVersion.buildVersion)
+            } header: {
+                Text(AppVersion.summary)
+            }
+
             Picker("Appearance", selection: appearanceBinding) {
                 ForEach(AppearanceMode.allCases) { mode in
                     Text(mode.label).tag(mode.rawValue)

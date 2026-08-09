@@ -10,12 +10,16 @@ if [[ -f "$ENV_FILE" ]]; then
   set +a
 fi
 
-APP_BUNDLE_NAME="MDViewer"
+EDITION="${EDITION:-Full}"
 DIST_DIR="${DIST_DIR:-dist}"
-APP_PATH="$DIST_DIR/$APP_BUNDLE_NAME.app"
-DMG_PATH="${DMG_PATH:-$DIST_DIR/MDViewer-macos.dmg}"
-STAGING_DIR="$DIST_DIR/dmg-staging"
+APP_PATH="${APP_PATH:-$DIST_DIR/MDViewer-$EDITION.app}"
+DMG_PATH="${DMG_PATH:-$DIST_DIR/MDViewer-$EDITION-macos.dmg}"
+STAGING_DIR="$DIST_DIR/dmg-staging-$EDITION"
 
+if [[ "$EDITION" != "Lite" && "$EDITION" != "Full" ]]; then
+  echo "EDITION must be Lite or Full."
+  exit 1
+fi
 if [[ ! -d "$APP_PATH" ]]; then
   echo "App bundle not found at $APP_PATH"
   exit 1
@@ -23,10 +27,10 @@ fi
 
 rm -rf "$STAGING_DIR" "$DMG_PATH" "$DMG_PATH.sha256"
 mkdir -p "$STAGING_DIR"
-ditto "$APP_PATH" "$STAGING_DIR/$APP_BUNDLE_NAME.app"
+ditto "$APP_PATH" "$STAGING_DIR/MDViewer.app"
 ln -s /Applications "$STAGING_DIR/Applications"
 hdiutil create \
-  -volname "$APP_BUNDLE_NAME" \
+  -volname "MDViewer $EDITION" \
   -srcfolder "$STAGING_DIR" \
   -ov \
   -format UDZO \

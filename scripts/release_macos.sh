@@ -3,7 +3,11 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
-DMG_PATH="${DMG_PATH:-dist/MDViewer-macos.dmg}"
 ./scripts/build_release.sh
-DMG_PATH="$DMG_PATH" ./scripts/make_dmg.sh
-DMG_PATH="$DMG_PATH" ./scripts/notarize_dmg.sh
+for edition in Lite Full; do
+  dmg_path="dist/MDViewer-$edition-macos.dmg"
+  EDITION="$edition" DMG_PATH="$dmg_path" ./scripts/make_dmg.sh
+  DMG_PATH="$dmg_path" ./scripts/notarize_dmg.sh
+done
+
+echo "Signed, notarized Lite and Full artifacts are ready in dist/."

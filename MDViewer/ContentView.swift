@@ -74,7 +74,16 @@ struct ContentView: View {
     @State private var navigationFolderAccess: FolderAccessLease?
     @State private var navigationNeedsFolderAccess = false
     @State private var isNavigating = false
+    @State private var isFindPresented = false
+    @State private var findQuery = ""
+    @State private var findStatus = ""
+    @State private var isQuickOpenPresented = false
+    @State private var quickOpenItems: [QuickOpenItem] = []
+    @State private var isOutlinePresented = false
+    @State private var outlineEntries: [OutlineEntry] = []
     @StateObject private var windowState = DocumentWindowState()
+    @StateObject private var webController = MarkdownWebViewController()
+    @StateObject private var folderWatcher = MarkdownFolderWatcher()
 
     init(document: MarkdownDocument, fileURL: URL?, palette: ThemePalette) {
         self.document = document
@@ -91,18 +100,71 @@ struct ContentView: View {
             palette: palette,
             zoomLevel: zoomLevel,
             resourceRoot: folderAccess?.rootURL,
+            controller: webController,
             onError: showRenderError,
-            onRelativeImages: handleRelativeImages
+            onRelativeImages: handleRelativeImages,
+            onOutline: handleOutline,
+            onInternalMarkdownLink: openInternalMarkdownLink
         )
         .background(palette.colors.background.swiftUIColor)
         .background(DocumentWindowAccessor(state: windowState))
         .overlay(alignment: .topTrailing) {
             resourceAccessNotice
         }
+        .overlay(alignment: .topLeading) {
+            if isFindPresented {
+                DocumentFindBar(
+                    query: $findQuery,
+                    status: findStatus,
+                    findNext: { performFind(backwards: false) },
+                    findPrevious: { performFind(backwards: true) },
+                    queryChanged: { performFind(backwards: false) },
+                    close: closeFind
+                )
+                .padding(8)
+            }
+        }
+        .toolbar {
+            ToolbarItemGroup(placement: .primaryAction) {
+                Button {
+                    openQuickOpen()
+                } label: {
+                    Image(systemName: "doc.text.magnifyingglass")
+                }
+                .help("Quick Open")
+                .disabled(fileURL == nil)
+
+                Button {
+                    isOutlinePresented.toggle()
+                } label: {
+                    Image(systemName: "list.bullet.indent")
+                }
+                .help("Document Outline")
+                .disabled(outlineEntries.isEmpty)
+                .popover(isPresented: $isOutlinePresented, arrowEdge: .top) {
+                    DocumentOutlinePopover(
+                        entries: outlineEntries,
+                        select: selectOutlineEntry
+                    )
+                }
+            }
+        }
+        .sheet(isPresented: $isQuickOpenPresented) {
+            QuickOpenPalette(
+                items: quickOpenItems,
+                open: openQuickOpenItem,
+                dismiss: closeQuickOpen
+            )
+        }
         .focusedSceneValue(\.documentCommandActions, commandActions)
         .task(id: fileURL) {
+            folderWatcher.stop()
             resetFolderAccess()
             prepareSiblingNavigation()
+        }
+        .onDisappear {
+            folderWatcher.stop()
+            closeFind()
         }
         .alert(item: $documentAlert) { alert in
             switch alert {
@@ -122,10 +184,19 @@ struct ContentView: View {
             canNavigatePrevious: !isNavigating && siblingTargets.previous != nil,
             canNavigateNext: !isNavigating && siblingTargets.next != nil,
             canRefreshSiblingNavigation: !isNavigating && fileURL != nil,
+            canFind: true,
+            canQuickOpen: !isNavigating && fileURL != nil,
+            canShowOutline: !outlineEntries.isEmpty,
             reload: reload,
             navigatePrevious: { navigate(to: .previous) },
             navigateNext: { navigate(to: .next) },
             refreshSiblingNavigation: refreshSiblingNavigation,
+            showFind: showFind,
+            findNext: { performFind(backwards: false) },
+            findPrevious: { performFind(backwards: true) },
+            showQuickOpen: openQuickOpen,
+            showOutline: { isOutlinePresented.toggle() },
+            printDocument: webController.printDocument,
             zoomIn: { handleZoom(.zoomIn) },
             zoomOut: { handleZoom(.zoomOut) },
             zoomReset: { handleZoom(.zoomReset) }
@@ -178,6 +249,150 @@ struct ContentView: View {
         }
     }
 
+    private func showFind() {
+        isFindPresented = true
+    }
+
+    private func closeFind() {
+        isFindPresented = false
+        findStatus = ""
+        webController.dismissFind()
+    }
+
+    private func performFind(backwards: Bool) {
+        guard isFindPresented, !findQuery.isEmpty else {
+            findStatus = ""
+            return
+        }
+        webController.find(findQuery, backwards: backwards) { found in
+            findStatus = found ? "Match found" : "No matches"
+        }
+    }
+
+    private func handleOutline(_ entries: [OutlineEntry]) {
+        outlineEntries = entries
+        guard let fileURL,
+              let fragment = PendingDocumentNavigation.shared.consumeFragment(
+                  for: fileURL
+              ) else {
+            return
+        }
+        webController.scrollToHeading(fragment)
+    }
+
+    private func selectOutlineEntry(_ entry: OutlineEntry) {
+        isOutlinePresented = false
+        webController.scrollToHeading(entry.id)
+    }
+
+    private func openQuickOpen() {
+        guard !isNavigating, let fileURL else { return }
+        isNavigating = true
+
+        Task { @MainActor in
+            defer { isNavigating = false }
+            do {
+                var access = navigationFolderAccess ?? folderAccess
+                if access == nil {
+                    access = try FolderAccessStore.shared.restoredAccess(for: fileURL)
+                }
+                if access == nil {
+                    access = try await FolderAccessStore.shared.requestAccess(
+                        for: fileURL,
+                        attachedTo: windowState.window,
+                        purpose: .quickOpen
+                    )
+                }
+                guard self.fileURL == fileURL, let access else { return }
+                navigationFolderAccess = access
+                navigationNeedsFolderAccess = false
+                startFolderWatcherIfAuthorized()
+                quickOpenItems = try MarkdownFileCatalog.files(in: access.rootURL)
+                    .map(QuickOpenItem.init(url:))
+                isQuickOpenPresented = true
+            } catch {
+                showNavigationError(title: "Couldn’t Open Quick Open", error: error)
+            }
+        }
+    }
+
+    private func closeQuickOpen() {
+        isQuickOpenPresented = false
+        quickOpenItems = []
+    }
+
+    private func openQuickOpenItem(_ item: QuickOpenItem) {
+        closeQuickOpen()
+        guard MarkdownFileCatalog.canonical(item.url)
+                != fileURL.map(MarkdownFileCatalog.canonical) else {
+            return
+        }
+        openDocumentAndCloseCurrent(item.url)
+    }
+
+    private func openInternalMarkdownLink(_ rawLink: String) {
+        guard !isNavigating, let fileURL else { return }
+        isNavigating = true
+
+        Task { @MainActor in
+            defer { isNavigating = false }
+            do {
+                var access = navigationFolderAccess ?? folderAccess
+                if access == nil {
+                    access = try FolderAccessStore.shared.restoredAccess(for: fileURL)
+                }
+                if access == nil {
+                    access = try await FolderAccessStore.shared.requestAccess(
+                        for: fileURL,
+                        attachedTo: windowState.window,
+                        purpose: .internalLinks
+                    )
+                }
+                guard self.fileURL == fileURL, let access else { return }
+                navigationFolderAccess = access
+                navigationNeedsFolderAccess = false
+                startFolderWatcherIfAuthorized()
+
+                let destination = try InternalMarkdownLinkResolver.resolve(
+                    rawLink: rawLink,
+                    documentURL: fileURL,
+                    authorizedRoot: access.rootURL
+                )
+                if MarkdownFileCatalog.canonical(destination.fileURL)
+                    == MarkdownFileCatalog.canonical(fileURL) {
+                    if let fragment = destination.fragment {
+                        webController.scrollToHeading(
+                            fragment.removingPercentEncoding ?? fragment
+                        )
+                    }
+                    return
+                }
+                PendingDocumentNavigation.shared.store(
+                    fragment: destination.fragment,
+                    for: destination.fileURL
+                )
+                try await openDocument(at: destination.fileURL)
+                windowState.window?.performClose(nil)
+            } catch {
+                showNavigationError(title: "Couldn’t Open Markdown Link", error: error)
+            }
+        }
+    }
+
+    private func openDocumentAndCloseCurrent(_ url: URL) {
+        guard !isNavigating else { return }
+        isNavigating = true
+        Task { @MainActor in
+            defer { isNavigating = false }
+            do {
+                try await openDocument(at: url)
+                windowState.window?.performClose(nil)
+            } catch {
+                showNavigationError(title: "Couldn’t Open Document", error: error)
+            }
+        }
+    }
+
     private func prepareSiblingNavigation() {
         siblingTargets = .none
         navigationFolderAccess = nil
@@ -192,6 +407,7 @@ struct ContentView: View {
                 &siblingTargets,
                 for: fileURL
             )
+            startFolderWatcherIfAuthorized()
         } catch {
             siblingTargets = .none
             navigationNeedsFolderAccess = true
@@ -224,6 +440,7 @@ struct ContentView: View {
                     }
                     guard self.fileURL == fileURL else { return }
                     navigationFolderAccess = access
+                    startFolderWatcherIfAuthorized()
                 }
 
                 try SiblingMarkdownNavigation.refresh(
@@ -231,6 +448,7 @@ struct ContentView: View {
                     for: fileURL
                 )
                 navigationNeedsFolderAccess = false
+                startFolderWatcherIfAuthorized()
             } catch {
                 siblingTargets = .none
                 navigationNeedsFolderAccess = true
@@ -239,6 +457,20 @@ struct ContentView: View {
                     error: error
                 )
             }
+        }
+    }
+
+    private func startFolderWatcherIfAuthorized() {
+        guard let root = navigationFolderAccess?.rootURL ?? folderAccess?.rootURL else {
+            folderWatcher.stop()
+            return
+        }
+        _ = folderWatcher.start(watching: root) {
+            guard let currentURL = fileURL else { return }
+            navigationNeedsFolderAccess = !SiblingMarkdownNavigation.refreshAfterReload(
+                &siblingTargets,
+                for: currentURL
+            )
         }
     }
 
@@ -306,13 +538,18 @@ struct ContentView: View {
         }
         relativeImagesRequested = true
 
-        guard folderAccess == nil,
-              let fileURL,
+        guard folderAccess == nil, let fileURL,
               !resourceAccessDeclined else { return }
+
+        if let navigationFolderAccess {
+            folderAccess = navigationFolderAccess
+            return
+        }
 
         if !didRestoreFolderAccess {
             do {
                 folderAccess = try FolderAccessStore.shared.restoredAccess(for: fileURL)
+                startFolderWatcherIfAuthorized()
             } catch {
                 showResourceError(error)
             }
@@ -351,6 +588,7 @@ struct ContentView: View {
                       self.fileURL == fileURL else { return }
                 folderAccess = access
                 resourceAccessDeclined = access == nil
+                startFolderWatcherIfAuthorized()
             } catch {
                 guard generation == resourceAccessGeneration,
                       self.fileURL == fileURL else { return }

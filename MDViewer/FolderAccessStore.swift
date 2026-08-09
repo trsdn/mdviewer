@@ -18,6 +18,8 @@ enum FolderAccessError: LocalizedError {
 enum FolderAccessPurpose {
     case relativeImages
     case siblingNavigation
+    case internalLinks
+    case quickOpen
 
     func title(for documentURL: URL) -> String {
         switch self {
@@ -25,6 +27,10 @@ enum FolderAccessPurpose {
             return "Grant Read-Only Folder Access"
         case .siblingNavigation:
             return "Enable Markdown File Navigation"
+        case .internalLinks:
+            return "Open Linked Markdown Files"
+        case .quickOpen:
+            return "Enable Current-Folder Quick Open"
         }
     }
 
@@ -34,6 +40,10 @@ enum FolderAccessPurpose {
             return "Choose the folder containing \(documentURL.lastPathComponent) to load its relative images."
         case .siblingNavigation:
             return "Choose the folder containing \(documentURL.lastPathComponent) to navigate between Markdown files."
+        case .internalLinks:
+            return "Choose the folder containing \(documentURL.lastPathComponent) to open its relative Markdown links."
+        case .quickOpen:
+            return "Choose the folder containing \(documentURL.lastPathComponent) to search its Markdown files."
         }
     }
 }

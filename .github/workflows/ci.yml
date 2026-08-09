@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "feature/**"]
+    tags: ["v*"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: macos-15
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        edition: [Lite, Full]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Verify vendored assets
+        run: ./scripts/vendor_web_assets.sh --check
+
+      - name: Generate project
+        run: xcodegen generate
+
+      - name: Test ${{ matrix.edition }}
+        run: |
+          xcodebuild \
+            -project MDViewer.xcodeproj \
+            -scheme "MDViewer-${{ matrix.edition }}" \
+            -configuration Debug \
+            -derivedDataPath "build/${{ matrix.edition }}" \
+            test \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Test native window commands
+        if: matrix.edition == 'Lite'
+        run: |
+          xcodebuild \
+            -project MDViewer.xcodeproj \
+            -scheme MDViewerUITests \
+            -configuration Debug \
+            -derivedDataPath build/UI \
+            test \
+            CODE_SIGNING_ALLOWED=NO
+
+  artifacts:
+    runs-on: macos-15
+    timeout-minutes: 30
+    needs: test
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      - name: Build and audit both editions
+        env:
+          ALLOW_UNSIGNED: "1"
+        run: ./scripts/build_release.sh
+
+      - name: Upload audited app bundles
+        uses: actions/upload-artifact@v4
+        with:
+          name: MDViewer-2.0-app-bundles
+          path: |
+            dist/MDViewer-Lite.app
+            dist/MDViewer-Full.app
+          if-no-files-found: error
