@@ -15,8 +15,8 @@ from Lite artifacts.
 | [marked-footnote](https://github.com/bent10/marked-extensions/tree/main/packages/footnote) | 1.4.0 | MIT | common | 4,091 |
 | [prismjs](https://github.com/PrismJS/prism) | 1.30.0 | MIT | lite | 11,126 |
 | [@highlightjs/cdn-assets](https://github.com/highlightjs/highlight.js) | 11.11.1 | BSD-3-Clause | full | 128,908 |
-| [js-yaml](https://github.com/nodeca/js-yaml) | 4.1.0 | MIT | full | 108,617 |
-| [mermaid](https://github.com/mermaid-js/mermaid) | 11.12.0 | MIT | full | 2,939,884 |
+| [js-yaml](https://github.com/nodeca/js-yaml) | 5.2.3 | MIT | full | 115,694 |
+| [mermaid](https://github.com/mermaid-js/mermaid) | 11.16.0 | MIT | full | 3,687,143 |
 | [svg-pan-zoom](https://github.com/bumbu/svg-pan-zoom) | 3.6.2 | BSD-2-Clause | full | 31,106 |
 
 ## Assets and checksums
@@ -75,25 +75,25 @@ from Lite artifacts.
 | `MDViewer/FullResources/HIGHLIGHTJS-LICENSE.txt` | `6c081431591d9df696c82dc598fe1423765b8a299b200ed00b281afd0f64c490` |
 | `MDViewer/FullResources/WebModules/highlight/highlight.min.mjs` | `7865839949f0764d9e0a21e311a4e2c42633eeaee8ca5ec127b86438565731fe` |
 
-### js-yaml 4.1.0 (full)
+### js-yaml 5.2.3 (full)
 
 - License: MIT
-- Source: https://registry.npmjs.org/js-yaml/-/js-yaml-4.1.0.tgz
+- Source: https://registry.npmjs.org/js-yaml/-/js-yaml-5.2.3.tgz
 - Note: ESM build, lazily imported only for a valid frontmatter delimiter.
 
 | File | SHA-256 |
 | --- | --- |
 | `MDViewer/FullResources/JS-YAML-LICENSE.txt` | `a07bc24468b9654ce76a547d47a2db282d07733b715db4c73a98bd63961f9550` |
-| `MDViewer/FullResources/WebModules/js-yaml/js-yaml.mjs` | `16f210b939b359b6ec8dde581eb62c157185711dc7b719b33779c43db5c31a91` |
+| `MDViewer/FullResources/WebModules/js-yaml/js-yaml.mjs` | `4c743c6486a71faa2cad75390173ab9a582283d8e2c108b9c17eae6de905df6b` |
 
-### mermaid 11.12.0 (full)
+### mermaid 11.16.0 (full)
 
 - License: MIT
-- Source: https://registry.npmjs.org/mermaid/-/mermaid-11.12.0.tgz
+- Source: https://registry.npmjs.org/mermaid/-/mermaid-11.16.0.tgz
 - Note: Official modular ESM distribution (minified entry plus every diagram chunk) so all supported diagram types render offline. The generated transitive notice file covers the complete installed dependency closure.
-- Transitive dependency closure: 115 pinned packages; exact names, versions, licenses, and sources are recorded in `third-party/manifest.json` and their license texts are bundled in `MDViewer/FullResources/MERMAID-TRANSITIVE-NOTICES.txt`.
+- Transitive dependency closure: 104 pinned packages; exact names, versions, licenses, and sources are recorded in `third-party/manifest.json` and their license texts are bundled in `MDViewer/FullResources/MERMAID-TRANSITIVE-NOTICES.txt`.
 
-76 files, 2,939,884 bytes.
+106 files, 3,687,143 bytes.
 Per-file SHA-256 checksums are recorded in `third-party/manifest.json`.
 
 ### svg-pan-zoom 3.6.2 (full)

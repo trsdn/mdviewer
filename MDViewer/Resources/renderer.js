@@ -50,6 +50,7 @@
     };
 
     let renderCount = 0;
+    let renderGeneration = 0;
     let imageViewer = null;
     let imageViewerState = null;
 
@@ -495,10 +496,20 @@
     }
 
     async function renderMarkdown(markdown) {
+        const generation = ++renderGeneration;
+        const isCurrent = () => generation === renderGeneration;
+        const staleResult = () => ({
+            images: [],
+            outline: [],
+            edition: config.edition || "lite",
+            generation,
+            cancelled: true
+        });
         const edition = window.__mdviewerEdition || {};
         const prepared = edition.preprocess
             ? await edition.preprocess(String(markdown))
             : { markdown: String(markdown), metadata: null };
+        if (!isCurrent()) return staleResult();
         const dirty = window.marked.parse(prepared.markdown);
         const template = document.createElement("template");
         template.innerHTML = sanitizeMarkdownHTML(dirty);
@@ -513,15 +524,24 @@
         if (edition.enhance) {
             await edition.enhance(content, {
                 config,
+                generation,
+                isCurrent,
                 metadata: prepared.metadata,
                 sanitizeMarkdownHTML
             });
         }
+        if (!isCurrent()) return staleResult();
         decorateCodeBlocks(content);
         decorateImages(content);
         renderCount += 1;
         window.__mdviewerRenderCount = renderCount;
-        return { images, outline, edition: config.edition || "lite" };
+        return {
+            images,
+            outline,
+            edition: config.edition || "lite",
+            generation,
+            cancelled: false
+        };
     }
 
     async function applyTheme(theme) {

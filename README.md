@@ -11,8 +11,8 @@ shared Swift and renderer codebase.
 
 | Edition | Recommended for | Release app | Compressed DMG |
 | --- | --- | ---: | ---: |
-| **Full** (recommended) | Broad highlighting, YAML metadata, and complete offline Mermaid support | 5.6 MB | 2.1 MB |
-| **Lite** | Minimum footprint with compact Prism highlighting | 2.5 MB | 1.1 MB |
+| **Full** (recommended) | Broad highlighting, YAML metadata, and complete offline Mermaid support | 7.0 MB | 2.3 MB |
+| **Lite** | Minimum footprint with compact Prism highlighting | 2.7 MB | 1.1 MB |
 
 Sizes were measured from unsigned universal Release builds produced by the
 2.0 scripts. Both editions use bundle identifier `com.torstenmahr.MDViewer`, so
@@ -44,8 +44,13 @@ Full replaces Prism with lazily imported highlight.js and adds:
 
 ## Install and build
 
-Download the **Full** or **Lite** DMG from
-[Releases](https://github.com/trsdn/mdviewer/releases), or build both editions:
+Download one of the DMGs from
+[Releases](https://github.com/trsdn/mdviewer/releases):
+
+- `MDViewer-Full-macos.dmg` — recommended
+- `MDViewer-Lite-macos.dmg` — minimum footprint
+
+Each DMG has a matching `.sha256` file. To build both editions locally:
 
 ```bash
 brew install xcodegen
@@ -109,13 +114,18 @@ by rendered content.
 | marked-footnote | 1.4.0 | MIT | Both | Footnotes |
 | Prism core | 1.30.0 | MIT | Lite | Compact selected-language highlighting |
 | highlight.js | 11.11.1 | BSD-3-Clause | Full | Broad lazy highlighting |
-| js-yaml | 4.1.0 | MIT | Full | Restricted frontmatter parsing |
-| Mermaid | 11.12.0 | MIT | Full | Complete offline diagrams |
+| js-yaml | 5.2.3 | MIT | Full | Restricted frontmatter parsing |
+| Mermaid | 11.16.0 | MIT | Full | Complete offline diagrams |
 | svg-pan-zoom | 3.6.2 | BSD-2-Clause | Full | Diagram pan and zoom |
 
 Exact asset checksums, provenance, bytes, and edition membership are recorded in
 [`third-party/manifest.json`](third-party/manifest.json) and
 [`docs/THIRD-PARTY-NOTICES.md`](docs/THIRD-PARTY-NOTICES.md).
+
+As of 2026-08-09, `npm audit` reports two moderate upstream advisories without
+a published fixed release. MDViewer never enables DOMPurify `IN_PLACE`; Mermaid
+uses trusted configuration, bounded/concurrent/timed rendering, and separately
+sanitized SVG. There are no high or critical audit findings.
 
 ## Need editing too?
 

@@ -10,6 +10,8 @@
         frontmatterEntries: 50,
         diagramBytes: 50000,
         diagrams: 20,
+        diagramConcurrency: 2,
+        diagramTimeoutMilliseconds: 12000,
         autoHighlightBytes: 100000
     };
     let highlightPromise = null;
@@ -17,6 +19,8 @@
     let mermaidPromise = null;
     let panZoomPromise = null;
     let currentTheme = null;
+    let currentRenderContext = null;
+    let diagramObserver = null;
     const renderedDiagrams = new Set();
     const diagnostics = {
         highlightLoaded: false,
@@ -29,6 +33,38 @@
 
     function importModule(path) {
         return import(`${moduleBase}${path}`);
+    }
+
+    function isCurrent(context, element) {
+        return (!context?.isCurrent || context.isCurrent())
+            && (!element || element.isConnected);
+    }
+
+    function withTimeout(promise, milliseconds) {
+        let timer;
+        const timeout = new Promise((_, reject) => {
+            timer = window.setTimeout(
+                () => reject(new Error("Diagram rendering timed out.")),
+                milliseconds
+            );
+        });
+        return Promise.race([promise, timeout])
+            .finally(() => window.clearTimeout(timer));
+    }
+
+    async function runWithDiagramConcurrency(containers, context) {
+        let next = 0;
+        const workers = Array.from(
+            { length: Math.min(limits.diagramConcurrency, containers.length) },
+            async () => {
+                while (next < containers.length && isCurrent(context)) {
+                    const index = next;
+                    next += 1;
+                    await renderDiagram(containers[index], context);
+                }
+            }
+        );
+        await Promise.all(workers);
     }
 
     function frontmatterSource(markdown) {
@@ -166,7 +202,7 @@
         return match ? match.slice("language-".length).toLowerCase() : "";
     }
 
-    async function highlightCode(root) {
+    async function highlightCode(root, context) {
         const blocks = Array.from(root.querySelectorAll("pre > code"))
             .filter((code) => !code.classList.contains("language-mermaid"));
         if (!blocks.length) return;
@@ -178,7 +214,9 @@
         } catch {
             return;
         }
+        if (!isCurrent(context, root)) return;
         for (const code of blocks) {
+            if (!isCurrent(context, code)) return;
             const source = code.textContent;
             code.dataset.mdviewerSource = source;
             const language = languageFor(code);
@@ -239,12 +277,12 @@
         return template.innerHTML;
     }
 
-    async function panZoomFor(svg) {
+    async function panZoomFor(svg, context) {
         panZoomPromise ||= importModule("svg-pan-zoom/svg-pan-zoom.min.js");
         try {
             await panZoomPromise;
             diagnostics.panZoomLoaded = true;
-            if (!window.svgPanZoom) return null;
+            if (!window.svgPanZoom || !isCurrent(context, svg)) return null;
             return window.svgPanZoom(svg, {
                 controlIconsEnabled: false,
                 zoomEnabled: true,
@@ -262,8 +300,9 @@
         }
     }
 
-    async function renderDiagram(container) {
-        if (container.dataset.state === "rendering") return;
+    async function renderDiagram(container, context = currentRenderContext) {
+        if (!isCurrent(context, container)
+            || container.dataset.state === "rendering") return;
         container.dataset.state = "rendering";
         const surface = container.querySelector(".md-diagram-surface");
         const error = container.querySelector(".md-diagram-error");
@@ -273,6 +312,7 @@
             mermaidPromise ||= importModule("mermaid/mermaid.esm.min.mjs");
             const mermaid = (await mermaidPromise).default;
             diagnostics.mermaidLoaded = true;
+            if (!isCurrent(context, container)) return;
             mermaid.initialize({
                 startOnLoad: false,
                 securityLevel: "strict",
@@ -283,20 +323,30 @@
                 sequence: { useMaxWidth: true }
             });
             const id = `mdviewer-diagram-${Math.random().toString(36).slice(2)}`;
-            const result = await mermaid.render(id, source);
+            const result = await withTimeout(
+                mermaid.render(id, source),
+                limits.diagramTimeoutMilliseconds
+            );
+            if (!isCurrent(context, container)) return;
             const clean = sanitizeSVG(result.svg);
             if (!clean.includes("<svg")) throw new Error("Diagram output was rejected.");
             surface.innerHTML = clean;
             const svg = surface.querySelector("svg");
             if (!svg) throw new Error("Diagram output is missing.");
             container._panZoom?.destroy?.();
-            container._panZoom = await panZoomFor(svg);
+            container._panZoom = await panZoomFor(svg, context);
+            if (!isCurrent(context, container)) {
+                container._panZoom?.destroy?.();
+                container._panZoom = null;
+                return;
+            }
             error.hidden = true;
             error.textContent = "";
             container.dataset.state = "rendered";
             renderedDiagrams.add(container);
             diagnostics.diagramRenderMilliseconds.push(performance.now() - started);
         } catch (reason) {
+            if (!isCurrent(context, container)) return;
             surface.replaceChildren();
             const fallback = document.createElement("pre");
             const code = document.createElement("code");
@@ -346,17 +396,36 @@
         return container;
     }
 
-    function prepareDiagrams(root) {
+    function prepareDiagrams(root, context) {
+        diagramObserver?.disconnect();
+        diagramObserver = null;
         const blocks = Array.from(root.querySelectorAll("pre > code.language-mermaid"));
+        const queue = [];
+        let active = 0;
+        const pump = () => {
+            while (active < limits.diagramConcurrency && queue.length && isCurrent(context)) {
+                active += 1;
+                const container = queue.shift();
+                renderDiagram(container, context).finally(() => {
+                    active -= 1;
+                    pump();
+                });
+            }
+        };
+        const enqueue = (container) => {
+            queue.push(container);
+            pump();
+        };
         const observer = "IntersectionObserver" in window
             ? new IntersectionObserver((entries, current) => {
                 for (const entry of entries) {
                     if (!entry.isIntersecting) continue;
                     current.unobserve(entry.target);
-                    renderDiagram(entry.target);
+                    enqueue(entry.target);
                 }
             }, { rootMargin: "300px" })
             : null;
+        diagramObserver = observer;
         blocks.forEach((code, index) => {
             const sourceBytes = new TextEncoder().encode(code.textContent).length;
             if (index >= limits.diagrams || sourceBytes > limits.diagramBytes) return;
@@ -364,19 +433,21 @@
             const diagram = makeDiagram(code);
             pre.replaceWith(diagram);
             if (observer) observer.observe(diagram);
-            else renderDiagram(diagram);
+            else enqueue(diagram);
         });
     }
 
-    async function rerenderDiagrams() {
+    async function rerenderDiagrams(context = currentRenderContext) {
+        const connected = [];
         for (const diagram of Array.from(renderedDiagrams)) {
             if (!diagram.isConnected) {
                 renderedDiagrams.delete(diagram);
                 continue;
             }
             diagram.dataset.state = "pending";
-            await renderDiagram(diagram);
+            connected.push(diagram);
         }
+        await runWithDiagramConcurrency(connected, context);
     }
 
     window.__mdviewerEdition = {
@@ -402,23 +473,29 @@
             }
         },
         async enhance(root, context) {
+            currentRenderContext = context;
             insertFrontmatterCard(root, context.metadata);
-            prepareDiagrams(root);
-            await highlightCode(root);
+            prepareDiagrams(root, context);
+            await highlightCode(root, context);
         },
         async themeChanged(theme) {
             currentTheme = theme;
-            if (renderedDiagrams.size) await rerenderDiagrams();
+            if (renderedDiagrams.size) await rerenderDiagrams(currentRenderContext);
         },
         async preparePrint() {
             for (const card of document.querySelectorAll(".md-frontmatter")) card.open = true;
+            diagramObserver?.disconnect();
+            diagramObserver = null;
             const diagrams = Array.from(document.querySelectorAll(".md-diagram"));
-            await Promise.all(diagrams.map(async (diagram) => {
-                if (diagram.dataset.state !== "rendered") await renderDiagram(diagram);
+            await runWithDiagramConcurrency(
+                diagrams.filter((diagram) => diagram.dataset.state !== "rendered"),
+                currentRenderContext
+            );
+            for (const diagram of diagrams) {
                 diagram._panZoom?.resize();
                 diagram._panZoom?.fit();
                 diagram._panZoom?.center();
-            }));
+            }
         }
     };
 })();

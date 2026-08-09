@@ -171,6 +171,19 @@ final class MDViewer2ArchitectureTests: XCTestCase {
         }
     }
 
+    func testFullRendererCancelsStaleWorkAndBoundsDiagramRendering() throws {
+        #if MDVIEWER_FULL
+        let url = try XCTUnwrap(
+            Bundle.main.url(forResource: "renderer-full", withExtension: "js")
+        )
+        let source = try String(contentsOf: url, encoding: .utf8)
+        XCTAssertTrue(source.contains("diagramConcurrency: 2"))
+        XCTAssertTrue(source.contains("diagramTimeoutMilliseconds: 12000"))
+        XCTAssertTrue(source.contains("context.isCurrent()"))
+        XCTAssertTrue(source.contains("runWithDiagramConcurrency"))
+        #endif
+    }
+
     private func makeDirectory() throws -> URL {
         let url = FileManager.default.temporaryDirectory
             .appendingPathComponent(UUID().uuidString, isDirectory: true)
