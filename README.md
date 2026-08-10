@@ -19,6 +19,14 @@ Sizes were measured from unsigned universal Release builds produced by the
 installing one replaces the other rather than registering competing Markdown
 handlers. Settings shows the installed edition, version, and build.
 
+## Help and support
+
+The app includes **MDViewer Help** (`Cmd ?`) with navigation, reading, and
+edition-specific guidance. **About MDViewer** shows the installed edition,
+version, copyright, the [project website](https://trsdn.github.io/mdviewer/),
+the [GitHub repository](https://github.com/trsdn/mdviewer), and a direct
+[Report an Issue](https://github.com/trsdn/mdviewer/issues/new) link.
+
 ## Shared features
 
 - GitHub-flavored Markdown through pinned marked.js and DOMPurify
@@ -67,8 +75,9 @@ ALLOW_UNSIGNED=1 ./scripts/build_release.sh  # local/CI verification
 ./scripts/release_macos.sh                   # signed + notarized Lite and Full DMGs
 ```
 
-The release script produces clearly named DMGs and SHA-256 files, notarizes and
-staples both, and runs Gatekeeper checks. It does not publish a GitHub release.
+The release workflow produces clearly named DMGs and SHA-256 files, notarizes
+and staples both, runs Gatekeeper checks, and attaches the verified artifacts
+to the matching GitHub release.
 
 ## Keyboard shortcuts
 

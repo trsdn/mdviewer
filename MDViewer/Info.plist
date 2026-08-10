@@ -12,6 +12,8 @@
     <string>$(CURRENT_PROJECT_VERSION)</string>
     <key>CFBundleShortVersionString</key>
     <string>$(MARKETING_VERSION)</string>
+    <key>NSHumanReadableCopyright</key>
+    <string>Copyright © 2026 Torsten Mahr</string>
     <key>MDViewerEdition</key>
     <string>$(MDVIEWER_EDITION)</string>
     <key>CFBundlePackageType</key>

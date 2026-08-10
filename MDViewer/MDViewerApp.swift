@@ -18,6 +18,7 @@ struct MDViewerApp: App {
         }
         .commands {
             DocumentCommands()
+            SupportCommands()
 
             CommandGroup(after: .toolbar) {
                 Divider()
@@ -45,6 +46,16 @@ struct MDViewerApp: App {
                 darkThemeID: $darkThemeID
             )
         }
+
+        Window("About MDViewer", id: AppWindow.about) {
+            AboutMDViewerView()
+        }
+        .windowResizability(.contentSize)
+
+        Window("MDViewer Help", id: AppWindow.help) {
+            MDViewerHelpView()
+        }
+        .windowResizability(.contentSize)
     }
 
     private struct ResolvedThemeDocumentView: View {

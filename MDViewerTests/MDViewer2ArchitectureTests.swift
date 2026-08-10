@@ -16,6 +16,25 @@ final class MDViewer2ArchitectureTests: XCTestCase {
         )
     }
 
+    func testSupportLinksAndCopyrightAreStable() {
+        XCTAssertEqual(
+            AppInformation.websiteURL.absoluteString,
+            "https://trsdn.github.io/mdviewer/"
+        )
+        XCTAssertEqual(
+            AppInformation.sourceURL.absoluteString,
+            "https://github.com/trsdn/mdviewer"
+        )
+        XCTAssertEqual(
+            AppInformation.issueURL.absoluteString,
+            "https://github.com/trsdn/mdviewer/issues/new"
+        )
+        XCTAssertEqual(
+            AppInformation.copyright,
+            "Copyright © 2026 Torsten Mahr"
+        )
+    }
+
     func testEditionResourcesArePhysicallySeparated() {
         let bundle = Bundle.main
         XCTAssertNotNil(bundle.url(forResource: "renderer", withExtension: "js"))
