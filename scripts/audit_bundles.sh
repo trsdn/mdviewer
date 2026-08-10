@@ -23,7 +23,7 @@ for plist in "$lite_plist" "$full_plist"; do
   [[ "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$plist")" \
     == "com.torstenmahr.MDViewer" ]] || fail "unexpected bundle identifier in $plist"
   [[ "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$plist")" \
-    == "2.0.0" ]] || fail "unexpected marketing version in $plist"
+    == "2.0.1" ]] || fail "unexpected marketing version in $plist"
 done
 
 [[ "$(/usr/libexec/PlistBuddy -c 'Print :MDViewerEdition' "$lite_plist")" \

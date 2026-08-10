@@ -72,8 +72,8 @@ settings:
     PRODUCT_BUNDLE_IDENTIFIER: com.torstenmahr.MDViewer
     PRODUCT_NAME: MDViewer
     PRODUCT_MODULE_NAME: MDViewer
-    MARKETING_VERSION: "2.0.0"
-    CURRENT_PROJECT_VERSION: "5"
+    MARKETING_VERSION: "2.0.1"
+    CURRENT_PROJECT_VERSION: "6"
     INFOPLIST_FILE: MDViewer/Info.plist
     GENERATE_INFOPLIST_FILE: false
     SWIFT_VERSION: "5.9"
@@ -105,8 +105,8 @@ targetTemplates:
         PRODUCT_BUNDLE_IDENTIFIER: com.torstenmahr.MDViewer
         PRODUCT_NAME: MDViewer
         PRODUCT_MODULE_NAME: MDViewer
-        MARKETING_VERSION: "2.0.0"
-        CURRENT_PROJECT_VERSION: "5"
+        MARKETING_VERSION: "2.0.1"
+        CURRENT_PROJECT_VERSION: "6"
         INFOPLIST_FILE: MDViewer/Info.plist
         GENERATE_INFOPLIST_FILE: false
         SWIFT_VERSION: "5.9"

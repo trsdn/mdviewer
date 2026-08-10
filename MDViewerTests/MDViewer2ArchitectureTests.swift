@@ -9,7 +9,7 @@ final class MDViewer2ArchitectureTests: XCTestCase {
         XCTAssertTrue(EditionCapabilities.full.lazyBroadHighlighter)
         XCTAssertTrue(EditionCapabilities.full.lazyFrontmatterCards)
         XCTAssertTrue(EditionCapabilities.full.lazyDiagrams)
-        XCTAssertEqual(AppVersion.marketingVersion, "2.0.0")
+        XCTAssertEqual(AppVersion.marketingVersion, "2.0.1")
         XCTAssertEqual(
             Bundle.main.bundleIdentifier,
             "com.torstenmahr.MDViewer"

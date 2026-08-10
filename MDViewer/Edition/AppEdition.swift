@@ -85,7 +85,7 @@ enum AppVersion {
     }
 
     /// Short line shown in About and Settings, for example
-    /// `MDViewer Full 2.0.0 (7)`.
+    /// `MDViewer Full 2.0.1 (6)`.
     static var summary: String {
         "\(edition.productDisplayName) \(marketingVersion) (\(buildVersion))"
     }
