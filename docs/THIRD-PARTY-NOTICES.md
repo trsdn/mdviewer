@@ -1,6 +1,6 @@
 # Third-party notices
 
-MDViewer 2.0.1 bundles the following third-party
+MDViewer 2.1.0 bundles the following third-party
 software. Every asset is vendored from the pinned upstream release listed
 below by `scripts/vendor_web_assets.mjs`; nothing is downloaded at runtime.
 

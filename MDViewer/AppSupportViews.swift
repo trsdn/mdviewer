@@ -79,6 +79,8 @@ struct MDViewerHelpView: View {
 
                 helpSection("Open and navigate") {
                     helpRow("Open Markdown", "Use File > Open or drag a Markdown file onto MDViewer.")
+                    helpRow("Folder Navigator", "Press ⇧⌘B or use the toolbar to show the optional read-only sidebar. File > Open Folder… authorizes the document folder or an ancestor.")
+                    helpRow("Navigator limits", "Folders load only when expanded. Hidden items, packages, and symbolic links are excluded; loading is limited to 12 levels, 500 items per folder, and 5,000 items total.")
                     helpRow("Quick Open", "Press ⌘K to choose another Markdown file in the current folder.")
                     helpRow("Document outline", "Press ⇧⌘O to jump to a heading.")
                     helpRow("Sibling files", "Use ⌥⌘← and ⌥⌘→ to move between Markdown files.")

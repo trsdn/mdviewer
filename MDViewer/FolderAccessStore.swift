@@ -4,13 +4,16 @@ import Foundation
 enum FolderAccessError: LocalizedError {
     case wrongFolder
     case accessDenied
+    case symbolicLink
 
     var errorDescription: String? {
         switch self {
         case .wrongFolder:
-            return "Choose the folder that directly contains this Markdown document."
+            return "Choose the folder containing this Markdown document."
         case .accessDenied:
             return "macOS did not grant read access to the selected folder."
+        case .symbolicLink:
+            return "A symbolic link cannot be used as an authorized folder."
         }
     }
 }
@@ -20,6 +23,7 @@ enum FolderAccessPurpose {
     case siblingNavigation
     case internalLinks
     case quickOpen
+    case folderNavigator
 
     func title(for documentURL: URL) -> String {
         switch self {
@@ -31,6 +35,8 @@ enum FolderAccessPurpose {
             return "Open Linked Markdown Files"
         case .quickOpen:
             return "Enable Current-Folder Quick Open"
+        case .folderNavigator:
+            return "Open Folder in Navigator"
         }
     }
 
@@ -44,6 +50,8 @@ enum FolderAccessPurpose {
             return "Choose the folder containing \(documentURL.lastPathComponent) to open its relative Markdown links."
         case .quickOpen:
             return "Choose the folder containing \(documentURL.lastPathComponent) to search its Markdown files."
+        case .folderNavigator:
+            return "Choose this document’s folder or an ancestor. MDViewer will receive read-only access."
         }
     }
 }
@@ -119,6 +127,57 @@ final class FolderAccessStore {
         return matchingAccess
     }
 
+    /// Restores the narrowest saved folder that contains the document.
+    ///
+    /// Every returned lease is newly acquired for the destination window.
+    func restoredNavigatorAccess(
+        forDocumentContainedBy documentURL: URL,
+        preferredRoot: URL? = nil
+    ) throws -> FolderAccessLease? {
+        let documentFolder = canonicalFolder(for: documentURL)
+        let preferredCanonicalRoot = preferredRoot.map(FolderNavigatorPath.canonical)
+        let savedBookmarks = defaults.array(forKey: bookmarksKey) as? [Data] ?? []
+        var validBookmarks: [Data] = []
+        var candidates: [(url: URL, canonical: URL, bookmark: Data)] = []
+
+        for bookmark in savedBookmarks {
+            do {
+                var isStale = false
+                let url = try URL(
+                    resolvingBookmarkData: bookmark,
+                    options: [.withSecurityScope, .withoutUI],
+                    relativeTo: nil,
+                    bookmarkDataIsStale: &isStale
+                )
+                try rejectSymbolicLink(url)
+                let canonical = FolderNavigatorPath.canonical(url)
+                let retained = isStale ? try makeReadOnlyBookmark(for: url) : bookmark
+                validBookmarks.append(retained)
+                if Self.isComponentAncestor(canonical, of: documentFolder),
+                   preferredCanonicalRoot == nil || canonical == preferredCanonicalRoot {
+                    candidates.append((url, canonical, retained))
+                }
+            } catch {
+                continue
+            }
+        }
+        if validBookmarks != savedBookmarks {
+            defaults.set(validBookmarks, forKey: bookmarksKey)
+        }
+
+        for candidate in candidates.sorted(by: {
+            $0.canonical.pathComponents.count > $1.canonical.pathComponents.count
+        }) {
+            if let lease = try? FolderAccessLease(
+                securityScopedURL: candidate.url,
+                rootURL: candidate.canonical
+            ) {
+                return lease
+            }
+        }
+        return nil
+    }
+
     func requestAccess(
         for documentURL: URL,
         attachedTo window: NSWindow?,
@@ -139,7 +198,11 @@ final class FolderAccessStore {
         guard response == .OK, let selectedURL = panel.url else { return nil }
 
         let canonicalSelection = selectedURL.standardizedFileURL.resolvingSymlinksInPath()
-        guard canonicalSelection == expectedRoot else {
+        try rejectSymbolicLink(selectedURL)
+        let isAllowed = purpose == .folderNavigator
+            ? Self.isComponentAncestor(canonicalSelection, of: expectedRoot)
+            : canonicalSelection == expectedRoot
+        guard isAllowed else {
             throw FolderAccessError.wrongFolder
         }
 
@@ -159,6 +222,30 @@ final class FolderAccessStore {
             .deletingLastPathComponent()
             .standardizedFileURL
             .resolvingSymlinksInPath()
+    }
+
+    nonisolated static func isComponentAncestor(_ ancestor: URL, of item: URL) -> Bool {
+        let ancestorComponents = FolderNavigatorPath.canonical(ancestor).pathComponents
+        let itemComponents = FolderNavigatorPath.canonical(item).pathComponents
+        return itemComponents.count >= ancestorComponents.count
+            && Array(itemComponents.prefix(ancestorComponents.count)) == ancestorComponents
+    }
+
+    nonisolated static func mostSpecificAncestor(
+        of item: URL,
+        among candidates: [URL]
+    ) -> URL? {
+        candidates
+            .map(FolderNavigatorPath.canonical)
+            .filter { isComponentAncestor($0, of: item) }
+            .max { $0.pathComponents.count < $1.pathComponents.count }
+    }
+
+    private func rejectSymbolicLink(_ url: URL) throws {
+        let values = try url.resourceValues(forKeys: [.isSymbolicLinkKey])
+        if values.isSymbolicLink == true {
+            throw FolderAccessError.symbolicLink
+        }
     }
 
     private func makeReadOnlyBookmark(for url: URL) throws -> Data {

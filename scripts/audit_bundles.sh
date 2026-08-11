@@ -23,7 +23,7 @@ for plist in "$lite_plist" "$full_plist"; do
   [[ "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleIdentifier' "$plist")" \
     == "com.torstenmahr.MDViewer" ]] || fail "unexpected bundle identifier in $plist"
   [[ "$(/usr/libexec/PlistBuddy -c 'Print :CFBundleShortVersionString' "$plist")" \
-    == "2.0.1" ]] || fail "unexpected marketing version in $plist"
+    == "2.1.0" ]] || fail "unexpected marketing version in $plist"
 done
 
 [[ "$(/usr/libexec/PlistBuddy -c 'Print :MDViewerEdition' "$lite_plist")" \
@@ -79,6 +79,10 @@ done
 
 lite_bytes="$(du -sk "$lite_app" | awk '{print $1 * 1024}')"
 full_bytes="$(du -sk "$full_app" | awk '{print $1 * 1024}')"
+python3 scripts/check_artifact_size.py \
+  "$lite_app" \
+  config/artifact-size-baselines.json \
+  macos-lite-app-deterministic-zip
 echo "Bundle audit passed."
 echo "  Lite: $lite_bytes bytes"
 echo "  Full: $full_bytes bytes"

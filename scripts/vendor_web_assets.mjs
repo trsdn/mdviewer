@@ -535,7 +535,7 @@ async function main() {
     schema: 1,
     generatedBy: "scripts/vendor_web_assets.mjs",
     product: "MDViewer",
-    productVersion: "2.0.1",
+    productVersion: "2.1.0",
     editions: {
       lite: ["common", "lite"],
       full: ["common", "full"],

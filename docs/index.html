@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MDViewer 2.0 — Lite and Full macOS Markdown Viewer</title>
+<title>MDViewer 2.1 — Lite and Full macOS Markdown Viewer</title>
 <meta name="description" content="A native secure macOS Markdown viewer in Lite and Full editions, with offline rendering, navigation, themes, highlighting, and optional Mermaid support.">
 <meta name="keywords" content="markdown viewer, macOS, markdown reader, sepia, themes, dark mode, lightweight, SwiftUI, markdown app">
 <meta name="author" content="Torsten Mahr">
@@ -15,13 +15,13 @@
 
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://trsdn.github.io/mdviewer/">
-<meta property="og:title" content="MDViewer 2.0 — Lite and Full">
+<meta property="og:title" content="MDViewer 2.1 — Lite and Full">
 <meta property="og:description" content="One native secure Markdown viewer, two physically separated editions. Full adds lazy Mermaid, broad highlighting, and YAML metadata.">
 <meta property="og:site_name" content="MDViewer">
 <meta property="og:locale" content="en_US">
 
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="MDViewer 2.0 — Lite and Full for macOS">
+<meta name="twitter:title" content="MDViewer 2.1 — Lite and Full for macOS">
 <meta name="twitter:description" content="Secure offline Markdown rendering, native navigation, and two editions from one shared codebase.">
 
 <script type="application/ld+json">
@@ -33,7 +33,7 @@
   "applicationCategory": "DeveloperApplication",
   "description": "A native macOS Markdown viewer with secure offline rendering in Lite and Full editions.",
   "fileSize": "5.6MB",
-  "softwareVersion": "2.0.1",
+  "softwareVersion": "2.1.0",
   "license": "https://opensource.org/licenses/MIT",
   "url": "https://trsdn.github.io/mdviewer/",
   "downloadUrl": "https://github.com/trsdn/mdviewer/releases/latest",
@@ -625,7 +625,7 @@ footer a:hover { color: var(--fg); }
     <section class="hero" id="hero">
         <div class="hero-icon" role="img" aria-label="MDViewer app icon">md</div>
         <h1>Read markdown,<br><em>nothing else.</em></h1>
-        <p class="hero-sub">MDViewer 2.0 is one native, secure codebase in two editions. Full is recommended; Lite keeps the minimum footprint.</p>
+        <p class="hero-sub">MDViewer 2.1 is one native, secure codebase in two editions. Full is recommended; Lite keeps the minimum footprint.</p>
         <div class="hero-cta">
             <a href="https://github.com/trsdn/mdviewer/releases/latest" class="btn-primary">Download for macOS</a>
             <a href="https://github.com/trsdn/mdviewer" class="btn-ghost" target="_blank" rel="noopener">View source &rarr;</a>
@@ -670,7 +670,7 @@ footer a:hover { color: var(--fg); }
             <article class="feature">
                 <p class="feature-num">02</p>
                 <h3>Fast native navigation</h3>
-                <p>Window-scoped Find, current-folder Quick Open, an outline popover, secure internal links, sibling navigation, and native folder events without polling.</p>
+                <p>Show the optional read-only Folder Navigator with ⇧⌘B. Explicitly authorize a document folder or ancestor; it then lazily loads only expanded directories, reveals the current file, and refreshes only loaded directories. Hidden items, packages, and symlinks stay excluded, with limits of 12 levels, 500 children per folder, and 5,000 loaded items. Find, Quick Open, outline, secure internal links, and sibling navigation remain available.</p>
             </article>
             <article class="feature">
                 <p class="feature-num">03</p>

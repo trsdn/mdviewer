@@ -151,6 +151,148 @@ final class MDViewerUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Second Heading"].exists)
     }
 
+    func testFolderNavigatorIsCollapsedByDefaultAndTogglesWithShortcut() async throws {
+        let documentURL = temporaryDirectory.appendingPathComponent("Navigator.md")
+        try Data("# Navigator".utf8).write(to: documentURL)
+
+        let app = XCUIApplication()
+        app.launchArguments += [
+            "-ApplePersistenceIgnoreState", "YES",
+            "-folderNavigatorVisible", "NO"
+        ]
+        app.launch()
+        try await openDocuments([documentURL])
+
+        let window = app.windows.matching(
+            NSPredicate(format: "title CONTAINS %@", "Navigator")
+        ).firstMatch
+        XCTAssertTrue(window.waitForExistence(timeout: 5))
+        window.click()
+        XCTAssertFalse(window.descendants(matching: .any)["folderNavigator"].exists)
+
+        app.typeKey("b", modifierFlags: [.command, .shift])
+        XCTAssertTrue(
+            window.descendants(matching: .any)["folderNavigator"]
+                .waitForExistence(timeout: 3)
+        )
+        app.typeKey("b", modifierFlags: [.command, .shift])
+        XCTAssertFalse(window.descendants(matching: .any)["folderNavigator"].exists)
+    }
+
+    func testFolderNavigatorExpansionCleanOpenSelectionAndReopen() async throws {
+        let guide = temporaryDirectory.appendingPathComponent("Guide", isDirectory: true)
+        try FileManager.default.createDirectory(at: guide, withIntermediateDirectories: true)
+        let firstURL = temporaryDirectory.appendingPathComponent("First.md")
+        let secondURL = guide.appendingPathComponent("Second.md")
+        try Data("# First".utf8).write(to: firstURL)
+        try Data("# Second".utf8).write(to: secondURL)
+
+        let app = XCUIApplication()
+        app.launchArguments += [
+            "-ApplePersistenceIgnoreState", "YES",
+            "-folderNavigatorVisible", "NO"
+        ]
+        app.launch()
+        try await openDocuments([firstURL])
+
+        let firstWindow = app.windows.matching(
+            NSPredicate(format: "title CONTAINS %@", "First")
+        ).firstMatch
+        XCTAssertTrue(firstWindow.waitForExistence(timeout: 5))
+        firstWindow.click()
+        app.typeKey("b", modifierFlags: [.command, .shift])
+        XCTAssertTrue(firstWindow.descendants(matching: .any)["folderNavigator"]
+            .waitForExistence(timeout: 3))
+
+        app.menuItems["Open Folder…"].click()
+        let panel = app.sheets.firstMatch
+        XCTAssertTrue(panel.waitForExistence(timeout: 3))
+        app.typeKey("g", modifierFlags: [.command, .shift])
+        let locationField = app.sheets.textFields.firstMatch
+        XCTAssertTrue(locationField.waitForExistence(timeout: 2))
+        locationField.typeText(temporaryDirectory.path)
+        app.typeKey(.return, modifierFlags: [])
+        let grantAccess = panel.buttons["Grant Access"]
+        XCTAssertTrue(grantAccess.waitForExistence(timeout: 2))
+        grantAccess.click()
+        XCTAssertTrue(panel.waitForNonExistence(timeout: 5))
+
+        let expandGuide = firstWindow.buttons["folderNavigator.disclosure.Guide"]
+        XCTAssertTrue(
+            expandGuide.waitForExistence(timeout: 5),
+            firstWindow.debugDescription
+        )
+        XCTAssertEqual(expandGuide.label, "Expand Guide")
+        let currentFirst = firstWindow.buttons["folderNavigator.item.First.md"]
+        XCTAssertTrue(currentFirst.waitForExistence(timeout: 3))
+        XCTAssertTrue(currentFirst.label.contains("current document"))
+        currentFirst.click()
+
+        // Home selects the root; Return collapses it and Space expands it.
+        app.typeKey(.home, modifierFlags: [])
+        app.typeKey(.return, modifierFlags: [])
+        XCTAssertFalse(expandGuide.exists)
+        app.typeKey(.space, modifierFlags: [])
+        XCTAssertTrue(expandGuide.waitForExistence(timeout: 3))
+
+        // End selects the last visible item (First.md). Home/Down then target
+        // Guide; expanding it and Down/Return opens its clean child.
+        app.typeKey(.end, modifierFlags: [])
+        let selectedFirstRow = firstWindow.outlineRows.element(boundBy: 2)
+        XCTAssertTrue(selectedFirstRow.isSelected)
+        XCTAssertTrue(
+            selectedFirstRow.buttons["folderNavigator.item.First.md"].exists
+        )
+        app.typeKey(.home, modifierFlags: [])
+        app.typeKey(.downArrow, modifierFlags: [])
+        let guideRow = firstWindow.outlineRows.element(boundBy: 1)
+        let guideSelected = XCTNSPredicateExpectation(
+            predicate: NSPredicate { object, _ in
+                (object as? XCUIElement)?.isSelected == true
+            },
+            object: guideRow
+        )
+        await fulfillment(of: [guideSelected], timeout: 3)
+        expandGuide.click()
+        let secondFile = firstWindow.buttons["folderNavigator.item.Guide/Second.md"]
+        XCTAssertTrue(secondFile.waitForExistence(timeout: 5))
+        app.typeKey(.downArrow, modifierFlags: [])
+        let selectedSecondRow = firstWindow.outlineRows.element(boundBy: 2)
+        XCTAssertTrue(selectedSecondRow.isSelected)
+        XCTAssertTrue(
+            selectedSecondRow.buttons[
+                "folderNavigator.item.Guide/Second.md"
+            ].exists
+        )
+        app.typeKey(.return, modifierFlags: [])
+
+        let secondWindow = app.windows.matching(
+            NSPredicate(format: "title CONTAINS %@", "Second")
+        ).firstMatch
+        XCTAssertTrue(secondWindow.waitForExistence(timeout: 5))
+        let currentSecond = secondWindow.buttons[
+            "folderNavigator.item.Guide/Second.md"
+        ]
+        XCTAssertTrue(currentSecond.waitForExistence(timeout: 5))
+        XCTAssertTrue(currentSecond.label.contains("current document"))
+        let currentSecondRow = secondWindow.outlineRows.element(boundBy: 2)
+        XCTAssertTrue(currentSecondRow.isSelected)
+        XCTAssertTrue(
+            currentSecondRow.buttons[
+                "folderNavigator.item.Guide/Second.md"
+            ].exists
+        )
+
+        secondWindow.click()
+        app.typeKey("b", modifierFlags: [.command, .shift])
+        XCTAssertFalse(secondWindow.descendants(matching: .any)["folderNavigator"].exists)
+        app.typeKey("b", modifierFlags: [.command, .shift])
+        XCTAssertTrue(secondWindow.descendants(matching: .any)["folderNavigator"]
+            .waitForExistence(timeout: 3))
+        XCTAssertTrue(currentSecond.exists)
+        XCTAssertTrue(currentSecond.label.contains("current document"))
+    }
+
     private func openDocuments(_ urls: [URL]) async throws {
         let bundleIdentifier = "com.torstenmahr.MDViewer"
         let appURL = try XCTUnwrap(

@@ -72,8 +72,8 @@ settings:
     PRODUCT_BUNDLE_IDENTIFIER: com.torstenmahr.MDViewer
     PRODUCT_NAME: MDViewer
     PRODUCT_MODULE_NAME: MDViewer
-    MARKETING_VERSION: "2.0.1"
-    CURRENT_PROJECT_VERSION: "6"
+    MARKETING_VERSION: "2.1.0"
+    CURRENT_PROJECT_VERSION: "7"
     INFOPLIST_FILE: MDViewer/Info.plist
     GENERATE_INFOPLIST_FILE: false
     SWIFT_VERSION: "5.9"
@@ -87,6 +87,7 @@ settings:
       ENABLE_HARDENED_RUNTIME: true
       SWIFT_OPTIMIZATION_LEVEL: "-Osize"
       DEAD_CODE_STRIPPING: true
+      DEPLOYMENT_POSTPROCESSING: true
       STRIP_INSTALLED_PRODUCT: true
       STRIP_SWIFT_SYMBOLS: true
       STRIP_STYLE: "non-global"
@@ -105,8 +106,8 @@ targetTemplates:
         PRODUCT_BUNDLE_IDENTIFIER: com.torstenmahr.MDViewer
         PRODUCT_NAME: MDViewer
         PRODUCT_MODULE_NAME: MDViewer
-        MARKETING_VERSION: "2.0.1"
-        CURRENT_PROJECT_VERSION: "6"
+        MARKETING_VERSION: "2.1.0"
+        CURRENT_PROJECT_VERSION: "7"
         INFOPLIST_FILE: MDViewer/Info.plist
         GENERATE_INFOPLIST_FILE: false
         SWIFT_VERSION: "5.9"
@@ -120,6 +121,7 @@ targetTemplates:
           ENABLE_HARDENED_RUNTIME: true
           SWIFT_OPTIMIZATION_LEVEL: "-Osize"
           DEAD_CODE_STRIPPING: true
+          DEPLOYMENT_POSTPROCESSING: true
           STRIP_INSTALLED_PRODUCT: true
           STRIP_SWIFT_SYMBOLS: true
           STRIP_STYLE: "non-global"

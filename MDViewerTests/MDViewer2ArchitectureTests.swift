@@ -9,11 +9,27 @@ final class MDViewer2ArchitectureTests: XCTestCase {
         XCTAssertTrue(EditionCapabilities.full.lazyBroadHighlighter)
         XCTAssertTrue(EditionCapabilities.full.lazyFrontmatterCards)
         XCTAssertTrue(EditionCapabilities.full.lazyDiagrams)
-        XCTAssertEqual(AppVersion.marketingVersion, "2.0.1")
+        XCTAssertEqual(AppVersion.marketingVersion, "2.1.0")
         XCTAssertEqual(
             Bundle.main.bundleIdentifier,
             "com.torstenmahr.MDViewer"
         )
+    }
+
+    func testFolderNavigatorBehaviorContract() {
+        XCTAssertEqual(
+            MarkdownFileCatalog.supportedExtensions,
+            ["md", "markdown", "mdown", "mkd"]
+        )
+        XCTAssertEqual(FolderNavigatorLimits.standard.maximumDepth, 12)
+        XCTAssertEqual(FolderNavigatorLimits.standard.maximumDirectChildren, 500)
+        XCTAssertEqual(FolderNavigatorLimits.standard.maximumLoadedNodes, 5_000)
+        XCTAssertEqual(FolderNavigatorLimits.standard.maximumPayloadBytes, 1_048_576)
+        XCTAssertEqual(RecursiveFolderNavigatorWatcher.defaultDebounce, .milliseconds(250))
+        XCTAssertEqual(FolderNavigatorLayout.defaultWidth, 240)
+        XCTAssertEqual(FolderNavigatorLayout.minimumWidth, 180)
+        XCTAssertEqual(FolderNavigatorLayout.maximumWidth, 420)
+        XCTAssertEqual(FolderNavigatorLayout.shortcut, "Cmd+Shift+B")
     }
 
     func testSupportLinksAndCopyrightAreStable() {

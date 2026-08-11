@@ -16,6 +16,7 @@ permissions:
 
 jobs:
   macos-dmgs:
+    if: ${{ github.event_name == 'workflow_dispatch' }}
     name: Build signed and notarized Lite and Full DMGs
     runs-on: macos-15
     timeout-minutes: 45

@@ -1,4 +1,4 @@
-# MDViewer 2.0
+# MDViewer 2.1
 
 A native, read-only macOS Markdown viewer with two editions built from one
 shared Swift and renderer codebase.
@@ -15,7 +15,7 @@ shared Swift and renderer codebase.
 | **Lite** | Minimum footprint with compact Prism highlighting | 2.7 MB | 1.1 MB |
 
 Sizes were measured from unsigned universal Release builds produced by the
-2.0 scripts. Both editions use bundle identifier `com.torstenmahr.MDViewer`, so
+release scripts. Both editions use bundle identifier `com.torstenmahr.MDViewer`, so
 installing one replaces the other rather than registering competing Markdown
 handlers. Settings shows the installed edition, version, and build.
 
@@ -32,6 +32,7 @@ the [GitHub repository](https://github.com/trsdn/mdviewer), and a direct
 - GitHub-flavored Markdown through pinned marked.js and DOMPurify
 - Footnotes, GitHub alerts, accessible read-only task lists, and heading anchors
 - Native window-scoped Find, current-folder Quick Open, and outline popover
+- Optional, collapsed-by-default read-only folder navigator (`Cmd Shift B`)
 - Secure relative links to authorized Markdown files
 - Native debounced folder events for sibling navigation; no polling
 - Local PNG, JPEG, GIF, and WebP images through a confined custom resource loader
@@ -86,10 +87,24 @@ to the matching GitHub release.
 | Find / next / previous | `Cmd F` / `Cmd G` / `Cmd Shift G` |
 | Quick Open current folder | `Cmd K` |
 | Document outline | `Cmd Shift O` |
+| Folder Navigator | `Cmd Shift B` |
 | Reload | `Cmd R` |
 | Previous / next Markdown file | `Cmd Option Left` / `Cmd Option Right` |
 | Zoom in / out / actual size | `Cmd +` / `Cmd -` / `Cmd 0` |
 | System / light / dark appearance | `Cmd Shift 0` / `Cmd Shift 1` / `Cmd Shift 2` |
+
+## Folder Navigator
+
+Choose **View > Folder Navigator** or use its toolbar button to show the
+sidebar. **File > Open Folder…** authorizes the current document’s folder or an
+ancestor with read-only access. The current file is revealed automatically,
+and selecting another Markdown file uses MDViewer’s normal document-open path.
+
+The navigator is local-only and intentionally has no file-management actions.
+It loads only a directory that is expanded, ignores hidden items, packages,
+symlinks, and unsupported files, and refreshes only directories already
+loaded. To stay responsive on large or hostile trees it is limited to 12
+levels, 500 direct children per folder, and 5,000 loaded items.
 
 ## Security
 
