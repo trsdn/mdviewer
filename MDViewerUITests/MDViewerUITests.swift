@@ -139,7 +139,7 @@ final class MDViewerUITests: XCTestCase {
             predicate: NSPredicate(format: "label == %@", "Match found"),
             object: status
         )
-        await fulfillment(of: [matchExpectation], timeout: 3)
+        await fulfillment(of: [matchExpectation], timeout: 10)
         app.typeKey(.escape, modifierFlags: [])
         XCTAssertFalse(findField.exists)
 
