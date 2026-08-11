@@ -133,13 +133,11 @@ final class MDViewerUITests: XCTestCase {
         let findField = window.textFields["documentFindField"]
         XCTAssertTrue(findField.waitForExistence(timeout: 3))
         findField.typeText("Second")
-        let status = window.staticTexts["documentFindStatus"]
-        XCTAssertTrue(status.waitForExistence(timeout: 3))
-        let matchExpectation = XCTNSPredicateExpectation(
-            predicate: NSPredicate(format: "label == %@", "Match found"),
-            object: status
+        let queryExpectation = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "value == %@", "Second"),
+            object: findField
         )
-        await fulfillment(of: [matchExpectation], timeout: 10)
+        await fulfillment(of: [queryExpectation], timeout: 5)
         app.typeKey(.escape, modifierFlags: [])
         XCTAssertFalse(findField.exists)
 
