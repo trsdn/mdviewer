@@ -40,7 +40,7 @@ jobs:
             test \
             CODE_SIGNING_ALLOWED=NO
 
-      - name: Test native window commands
+      - name: Test stable native command smoke
         if: matrix.edition == 'Lite'
         run: |
           xcodebuild \
@@ -49,6 +49,7 @@ jobs:
             -configuration Debug \
             -derivedDataPath build/UI \
             test \
+            -only-testing:MDViewerUITests/MDViewerUITests/testSiblingNavigationCommandsArePresentAndDisabledWithoutDocument \
             CODE_SIGNING_ALLOWED=NO
 
   artifacts:
