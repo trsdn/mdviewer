@@ -39,7 +39,7 @@ the [GitHub repository](https://github.com/trsdn/mdviewer), and a direct
 - Dependency-free image inspection with fit, zoom, pan, and original size
 - Code language labels plus Copy, wrap, and line-number controls
 - GitHub, Solarized, Sepia, Dracula, Monokai, and Nord reading palettes
-- Window-scoped zoom, reload, Recent Files, drag and drop, and printing
+- Window-scoped zoom, reload, Recent Files, and printing
 
 Lite includes a 10,060-byte custom Prism build for Swift, JavaScript,
 TypeScript, JSON, Bash, Python, Rust, HTML, and CSS.
