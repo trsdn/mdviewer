@@ -30,7 +30,7 @@ struct FolderNavigatorSidebar: View {
                     .font(.headline)
                 Spacer()
                 Button(action: chooseRoot) {
-                    Image(systemName: "folder.badge.plus")
+                    Image(systemName: "folder")
                 }
                 .help("Open Folder…")
                 .accessibilityLabel("Open folder in navigator")

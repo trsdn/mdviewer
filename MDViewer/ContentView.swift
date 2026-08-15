@@ -98,7 +98,7 @@ struct ContentView: View {
 
     var body: some View {
         NavigationSplitView(columnVisibility: Binding(
-            get: { folderNavigator.isVisible ? .all : .detailOnly },
+            get: { folderNavigator.isVisible ? .doubleColumn : .detailOnly },
             set: { folderNavigator.isVisible = $0 != .detailOnly }
         )) {
             FolderNavigatorSidebar(
