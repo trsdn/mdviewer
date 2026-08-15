@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+- Added drag and drop from Finder: dropped Markdown files open in their own
+  windows, a dropped folder becomes the Folder Navigator root, and unsupported
+  items explain why they were rejected.
+- Fixed the toolbar Folder Navigator button, which could hide the sidebar but
+  never show it again, and replaced its misleading "new folder" glyph.
+
 ## 2.1.0
 
 - Added an optional, collapsed-by-default Folder Navigator to Lite and Full.

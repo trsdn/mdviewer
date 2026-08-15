@@ -217,6 +217,35 @@ final class FolderAccessStore {
         return access
     }
 
+    /// Adopts a folder that arrived through a Finder drop.
+    ///
+    /// A dropped URL cannot start a security scope directly, so the drop's
+    /// implicit access is converted into a persisted read-only bookmark and
+    /// re-resolved into a real lease.
+    func adoptedAccess(forDroppedFolder folderURL: URL) throws -> FolderAccessLease {
+        try rejectSymbolicLink(folderURL)
+        let values = try folderURL.resourceValues(forKeys: [.isDirectoryKey])
+        guard values.isDirectory == true else {
+            throw FolderAccessError.wrongFolder
+        }
+
+        let canonical = FolderNavigatorPath.canonical(folderURL)
+        let bookmark = try makeReadOnlyBookmark(for: folderURL)
+        try save(bookmark: bookmark, for: canonical)
+
+        var isStale = false
+        let scopedURL = try URL(
+            resolvingBookmarkData: bookmark,
+            options: [.withSecurityScope, .withoutUI],
+            relativeTo: nil,
+            bookmarkDataIsStale: &isStale
+        )
+        return try FolderAccessLease(
+            securityScopedURL: scopedURL,
+            rootURL: canonical
+        )
+    }
+
     private func canonicalFolder(for documentURL: URL) -> URL {
         documentURL
             .deletingLastPathComponent()

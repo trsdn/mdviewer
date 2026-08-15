@@ -141,6 +141,30 @@ struct ThemeApplicationState {
     }
 }
 
+/// A web view that never acts as a drag destination so window-level file drops
+/// reach the drop catcher above it instead of navigating the preview.
+final class DropPassthroughWebView: WKWebView {
+    override func viewDidMoveToWindow() {
+        super.viewDidMoveToWindow()
+        Self.unregisterDraggedTypes(in: self)
+    }
+
+    override func draggingEntered(_ sender: any NSDraggingInfo) -> NSDragOperation { [] }
+
+    override func draggingUpdated(_ sender: any NSDraggingInfo) -> NSDragOperation { [] }
+
+    override func prepareForDragOperation(_ sender: any NSDraggingInfo) -> Bool { false }
+
+    override func performDragOperation(_ sender: any NSDraggingInfo) -> Bool { false }
+
+    private static func unregisterDraggedTypes(in view: NSView) {
+        view.unregisterDraggedTypes()
+        for subview in view.subviews {
+            unregisterDraggedTypes(in: subview)
+        }
+    }
+}
+
 struct MarkdownWebView: NSViewRepresentable {
     let text: String
     let palette: ThemePalette
@@ -173,7 +197,7 @@ struct MarkdownWebView: NSViewRepresentable {
             name: Coordinator.printReadyHandlerName
         )
 
-        let webView = WKWebView(frame: .zero, configuration: configuration)
+        let webView = DropPassthroughWebView(frame: .zero, configuration: configuration)
         webView.setAccessibilityIdentifier("markdownPreview")
         webView.setAccessibilityLabel("Markdown preview")
         webView.setValue(false, forKey: "drawsBackground")

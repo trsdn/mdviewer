@@ -34,6 +34,8 @@ the [GitHub repository](https://github.com/trsdn/mdviewer), and a direct
 - Native window-scoped Find, current-folder Quick Open, and outline popover
 - Optional, collapsed-by-default read-only folder navigator (`Cmd Shift B`)
 - Secure relative links to authorized Markdown files
+- Drag and drop from Finder: each Markdown file opens in its own window and a
+  dropped folder becomes the Folder Navigator root
 - Native debounced folder events for sibling navigation; no polling
 - Local PNG, JPEG, GIF, and WebP images through a confined custom resource loader
 - Dependency-free image inspection with fit, zoom, pan, and original size

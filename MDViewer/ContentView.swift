@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 
 enum ZoomAction {
@@ -80,6 +81,7 @@ struct ContentView: View {
     @State private var isQuickOpenPresented = false
     @State private var quickOpenItems: [QuickOpenItem] = []
     @State private var isOutlinePresented = false
+    @State private var isDropTargeted = false
     @State private var outlineEntries: [OutlineEntry] = []
     @StateObject private var windowState = DocumentWindowState()
     @StateObject private var webController = MarkdownWebViewController()
@@ -130,6 +132,17 @@ struct ContentView: View {
         )
         .background(palette.colors.background.swiftUIColor)
         .background(DocumentWindowAccessor(state: windowState))
+        .overlay {
+            FileDropCatcher(
+                isTargeted: $isDropTargeted,
+                perform: openDropped
+            )
+        }
+        .overlay {
+            if isDropTargeted {
+                DropTargetOverlay(palette: palette)
+            }
+        }
         .overlay(alignment: .topTrailing) {
             resourceAccessNotice
         }
@@ -242,6 +255,54 @@ struct ContentView: View {
             zoomOut: { handleZoom(.zoomOut) },
             zoomReset: { handleZoom(.zoomReset) }
         )
+    }
+
+    private func openDropped(_ urls: [URL]) {
+        let manager = FileManager.default
+        let classified = DroppedItems.classify(urls) { url in
+            var isDirectory: ObjCBool = false
+            let exists = manager.fileExists(
+                atPath: url.path,
+                isDirectory: &isDirectory
+            )
+            return exists ? isDirectory.boolValue : nil
+        }
+
+        if let folder = classified.folders.first {
+            adoptDroppedFolder(folder)
+        }
+
+        for url in classified.markdownFiles {
+            guard MarkdownFileCatalog.canonical(url)
+                    != fileURL.map(MarkdownFileCatalog.canonical) else { continue }
+            Task { @MainActor in
+                do {
+                    try await openDocument(at: url)
+                } catch {
+                    showNavigationError(title: "Couldn’t Open Document", error: error)
+                }
+            }
+        }
+
+        guard classified.markdownFiles.isEmpty, classified.folders.isEmpty
+        else { return }
+
+        documentAlert = .error(
+            title: "Couldn’t Open Dropped Items",
+            message: DroppedItems.rejectionMessage(for: classified.unsupported)
+        )
+    }
+
+    private func adoptDroppedFolder(_ folderURL: URL) {
+        do {
+            let access = try FolderAccessStore.shared
+                .adoptedAccess(forDroppedFolder: folderURL)
+            folderNavigator.install(access)
+            folderNavigator.isVisible = true
+            Task { await folderNavigator.revealCurrentDocument() }
+        } catch {
+            showNavigationError(title: "Couldn’t Open Folder", error: error)
+        }
     }
 
     private func chooseFolderNavigatorRoot() {
@@ -695,6 +756,100 @@ struct ContentView: View {
             title: "Couldn’t Access Relative Images",
             message: error.localizedDescription
         )
+    }
+}
+
+/// Transparent AppKit drop destination layered above the document area.
+///
+/// SwiftUI's `onDrop` never sees Finder drags here because AppKit routes them
+/// to the front-most registered view, which is the preview web view. This
+/// catcher sits above it, accepts file URLs only, and stays click-through so
+/// normal interaction is untouched. Drags without file URLs return an empty
+/// operation so AppKit keeps searching the views below.
+private struct FileDropCatcher: NSViewRepresentable {
+    @Binding var isTargeted: Bool
+    let perform: ([URL]) -> Void
+
+    func makeNSView(context: Context) -> DropCatcherView {
+        let view = DropCatcherView()
+        view.registerForDraggedTypes([.fileURL])
+        view.onTargetingChange = { isTargeted = $0 }
+        view.onDrop = perform
+        return view
+    }
+
+    func updateNSView(_ nsView: DropCatcherView, context: Context) {
+        nsView.onTargetingChange = { isTargeted = $0 }
+        nsView.onDrop = perform
+    }
+
+    final class DropCatcherView: NSView {
+        var onTargetingChange: ((Bool) -> Void)?
+        var onDrop: (([URL]) -> Void)?
+
+        override func hitTest(_ point: NSPoint) -> NSView? { nil }
+
+        override var acceptsFirstResponder: Bool { false }
+
+        override func draggingEntered(_ sender: any NSDraggingInfo) -> NSDragOperation {
+            guard !fileURLs(from: sender).isEmpty else { return [] }
+            onTargetingChange?(true)
+            return .copy
+        }
+
+        override func draggingUpdated(_ sender: any NSDraggingInfo) -> NSDragOperation {
+            fileURLs(from: sender).isEmpty ? [] : .copy
+        }
+
+        override func draggingExited(_ sender: (any NSDraggingInfo)?) {
+            onTargetingChange?(false)
+        }
+
+        override func draggingEnded(_ sender: any NSDraggingInfo) {
+            onTargetingChange?(false)
+        }
+
+        override func prepareForDragOperation(_ sender: any NSDraggingInfo) -> Bool {
+            !fileURLs(from: sender).isEmpty
+        }
+
+        override func performDragOperation(_ sender: any NSDraggingInfo) -> Bool {
+            onTargetingChange?(false)
+            let urls = fileURLs(from: sender)
+            guard !urls.isEmpty else { return false }
+            onDrop?(urls)
+            return true
+        }
+
+        private func fileURLs(from sender: any NSDraggingInfo) -> [URL] {
+            let options: [NSPasteboard.ReadingOptionKey: Any] = [.urlReadingFileURLsOnly: true]
+            let objects = sender.draggingPasteboard.readObjects(
+                forClasses: [NSURL.self],
+                options: options
+            )
+            return (objects as? [URL]) ?? []
+        }
+    }
+}
+
+/// Highlight shown while a valid Finder drag hovers the document area.
+private struct DropTargetOverlay: View {
+    let palette: ThemePalette
+
+    var body: some View {
+        RoundedRectangle(cornerRadius: 12)
+            .strokeBorder(
+                palette.colors.splitterHover.swiftUIColor,
+                style: StrokeStyle(lineWidth: 3, dash: [10, 6])
+            )
+            .background(
+                palette.colors.splitterHover.swiftUIColor
+                    .opacity(0.08)
+                    .clipShape(RoundedRectangle(cornerRadius: 12))
+            )
+            .padding(8)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
     }
 }
 
