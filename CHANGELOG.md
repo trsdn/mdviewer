@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 2.2.0
 
 - Added drag and drop from Finder: dropped Markdown files open in their own
   windows, a dropped folder becomes the Folder Navigator root, and unsupported

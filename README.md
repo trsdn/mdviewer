@@ -1,4 +1,4 @@
-# MDViewer 2.1
+# MDViewer 2.2
 
 A native, read-only macOS Markdown viewer with two editions built from one
 shared Swift and renderer codebase.
