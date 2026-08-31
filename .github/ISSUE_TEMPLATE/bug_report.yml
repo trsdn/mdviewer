@@ -1,0 +1,79 @@
+name: Bug report
+description: Report a reproducible problem with MDViewer
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting a bug. Please provide enough detail for maintainers to reproduce and verify the issue.
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect MDViewer to do?
+      placeholder: The app should...
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What happened instead?
+      placeholder: The app instead...
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: List the exact steps required to reproduce the issue.
+      placeholder: |
+        1. Open...
+        2. Select...
+        3. Trigger...
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version / build
+      description: Include the app version and, if relevant, the build number.
+      placeholder: 2.2.0
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include macOS version, machine type, and any relevant configuration.
+      placeholder: |
+        macOS: 15.0
+        Hardware: MacBook Pro (14-inch, 2023)
+        Edition: Lite / Full
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Sanitized logs or screenshots
+      description: Paste relevant logs, console output, or screenshots after removing secrets, tokens, and personal content.
+      placeholder: |
+        Console output:
+        ...
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional context
+      description: Add anything else that may help maintainers investigate.
+      placeholder: Optional notes, links, and related issues.
+    validations:
+      required: false

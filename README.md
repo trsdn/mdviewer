@@ -27,6 +27,13 @@ version, copyright, the [project website](https://trsdn.github.io/mdviewer/),
 the [GitHub repository](https://github.com/trsdn/mdviewer), and a direct
 [Report an Issue](https://github.com/trsdn/mdviewer/issues/new) link.
 
+Project governance and intake files are kept in the repository root and issue
+templates:
+
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+- [SECURITY.md](SECURITY.md)
+
 ## Shared features
 
 - GitHub-flavored Markdown through pinned marked.js and DOMPurify

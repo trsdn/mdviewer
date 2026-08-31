@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability reporting
+    url: https://github.com/trsdn/mdviewer/security/advisories/new
+    about: Please use private vulnerability reporting instead of opening a public issue.
+  - name: Project discussions and support
+    url: https://github.com/trsdn/mdviewer/issues
+    about: Search existing issues and support reports before creating a new one.
