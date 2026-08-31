@@ -2,11 +2,34 @@ version: 2
 updates:
   - package-ecosystem: github-actions
     directory: "/"
+    target-branch: "main"
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    reviewers:
+      - "@trsdn"
+    assignees:
+      - "@trsdn"
+    labels:
+      - dependencies
+      - github-actions
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+
   - package-ecosystem: npm
     directory: "/vendor"
+    target-branch: "main"
     schedule:
       interval: weekly
     open-pull-requests-limit: 5
+    reviewers:
+      - "@trsdn"
+    assignees:
+      - "@trsdn"
+    labels:
+      - dependencies
+      - vendor
+    commit-message:
+      prefix: "chore"
+      include: "scope"

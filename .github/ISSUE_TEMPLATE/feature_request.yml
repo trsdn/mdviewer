@@ -1,0 +1,44 @@
+name: Feature request
+description: Suggest an improvement or new capability for MDViewer
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting an improvement. Please describe the problem, the audience, and the outcome you want.
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem or use case
+      description: What problem are you trying to solve or what workflow is currently awkward?
+      placeholder: Users often need to...
+    validations:
+      required: true
+
+  - type: textarea
+    id: desired
+    attributes:
+      label: Desired outcome
+      description: What would the ideal experience look like?
+      placeholder: A better workflow would allow...
+    validations:
+      required: true
+
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives considered
+      description: What workarounds or existing tools are you using today?
+      placeholder: We currently use...
+    validations:
+      required: false
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Add screenshots, references, or examples that clarify the request.
+      placeholder: Optional links, screenshots, references, or notes.
+    validations:
+      required: false
